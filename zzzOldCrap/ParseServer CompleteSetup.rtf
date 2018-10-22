@@ -1,0 +1,475 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\froman\fcharset0 Times-Roman;\f2\fmodern\fcharset0 Courier;
+\f3\fnil\fcharset0 Menlo-Regular;\f4\fnil\fcharset0 Menlo-Bold;}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red0\green0\blue0;\red255\green255\blue255;
+\red63\green110\blue116;\red0\green0\blue0;\red196\green26\blue22;\red170\green13\blue145;\red28\green0\blue207;
+\red38\green71\blue75;\red92\green38\blue153;\red46\green13\blue110;\red0\green116\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\csgenericrgb\c0\c0\c0;\csgenericrgb\c100000\c100000\c100000;
+\csgenericrgb\c24700\c43100\c45600;\cssrgb\c0\c0\c0;\csgenericrgb\c77000\c10200\c8600;\csgenericrgb\c66500\c5200\c56900;\csgenericrgb\c11000\c0\c81000;
+\csgenericrgb\c14900\c27800\c29400;\csgenericrgb\c35900\c14900\c60100;\csgenericrgb\c18100\c5200\c43100;\csgenericrgb\c0\c45600\c0;}
+\margl1440\margr1440\vieww21320\viewh13640\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Setting up a Parse server (from Swift class)\
+\
+\
+1> Log into AWS Console\
+\
+2> Look for EC2 (Elastic Cloud). Select this, takes you to the EC2 Management Console.\
+\
+3> On the EC2 Console, look for big blue button \'93Launch Instance\'94. Press it.\
+       Takes you to Step 1: Choose an Amazon Machine Image (AMI)\
+\
+4> Left Panel (Quick Start). Click AWS Marketplace\
+\
+5> Brings up a new screen, in search area, type \'93parse\'94\
+\
+6> Look for \'93Parse Server Certified by Bitnami\'94, press blue Select button.\
+\
+7> (Step 1) Pricing Details menu comes up, (Free tier eligible?)  T2 Nano is $0.006/hr?\
+     Press Blue Continue button at bottom right\
+\
+8>  (Step 2) Choose an Instance Type\
+      Choose t2.micro, (Free tier eligible)\
+\
+9>  Click Blue Review and Launch button near bottom right.\
+\
+9>  (Step 7) Click Blue Launch button.\
+\
+10>  A popup appears: Select an existing key pair\'85.\
+        From top pulldown, choose \'93Create a new key pair\'94\
+\
+11> Enter Key pair name : \'93InstashamiOSKeyPair\'94, press grey \'93Download Key Pair\'94 button\
+\
+12> Save Keypair to Downloads, move to Desktop.\
+        Should appear as InstashamiOSKeyPair.pem (name.pem)\
+        Save this file for later\'85 \
+\
+13> Finally, press Blue \'93Launch Instance\'94 button\
+         \'85this may take a few minutes\
+        I got this message:\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f1 \cf2 \expnd0\expndtw0\kerning0
+		 The Subscription Is taking longer than expected\'85\
+       
+\f0 \cf0 \kerning1\expnd0\expndtw0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0          \'85and info that they will email me when the \'93subscription\'94 is complete, may take an hour!\
+       .\'97\'97Server Assumed to be running at this point\'97\'97\'97\
+\
+14> Its Podfile time: open browser, goto https://cocoapods.org/\
+        Read for info\'85\
+\
+15> Open terminal, enter this command to install pods from scratch:\
+         
+\f2 \cf2 \expnd0\expndtw0\kerning0
+sudo gem install cocoapods\
+
+\f0 \cf0 \kerning1\expnd0\expndtw0 \
+         (need root password)\
+          \'85this takes a while\
+\
+16> Create new Xcode project on Desktop, call it instasham (folder name)\
+\
+17> Now in terminal where pods was installed, cd to Desktop/instasham\
+\
+18>  Enter following commands:\
+            pod init   (this creates pods crap in Xcode project)\
+            open -a Xcode Podfile    (this opens up the pod file for editing / inspection)\
+\
+19> Switch back to cocoapods.org browser window. In Top search box, enter \'93Parse\'94\
+       On my end, this fails, comes back with nothing in Safari, Chrome, and Firefox. OUCH\
+       CHECK OUT THESE LINKS:\
+		https://github.com/CocoaPods/CocoaPods/issues/6654\
+		https://github.com/CocoaPods/cocoapods.org/issues/351\
+       More 3rd party CRAP. Search is broken, has been on and off for a year.\
+       Use alternate search:\
+\
+	https://www.google.com/search?q=site%3Acocoapods.org+parse\
+\
+       This leads to \
+           https://cocoapods.org/pods/Parse\
+\
+20 > Look under Getting Started, add this to pod file\
+\
+        
+\f2 \cf2 \expnd0\expndtw0\kerning0
+pod 'Parse'\
+\
+     Should look like this (entire file)\
+\pard\tx692\pardeftab692\pardirnatural\partightenfactor0
+
+\f3\fs28 \cf3 \cb4 \kerning1\expnd0\expndtw0 \
+# Uncomment the next line to define a global platform for your project
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3 # platform :ios, '9.0'
+\f0\fs24 \cf0 \
+\
+
+\f3\fs28 \cf3 target 'instasham' do
+\f0\fs24 \cf0 \
+\
+
+\f3\fs28 \cf3    pod 'Parse'
+\f0\fs24 \cf0 \
+\
+
+\f3\fs28 \cf3 end
+\f2\fs24 \cf2 \cb1 \expnd0\expndtw0\kerning0
+   \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf2 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0 \cf0 \kerning1\expnd0\expndtw0 \
+	also get rid of target stuff at bottom of pod file, \
+	should only have one command then \'93end\'94.\
+      Save/Close file\'85\
+\
+21>  Go back to terminal, enter \'93pod install\'94\
+      \'85takes a while\
+\
+22>  Close Xcode project, open the Workspace file instead.\
+\
+       This has 2 groups, the project \'93instasham\'94 and \'93Pods\'94\
+\
+       There will be TONS of swift4 warnings> IGNORE THESE.\
+         If you try to fix them the 3rd party Bolts/Parse/Etc code WON\'92T WORK\
+\
+       (these errors conveniently DON\'92T appear in the lesson because it was using Swift 3)\
+\
+23>  Go to AWS EC2 Console:\
+        https://us-west-2.console.aws.amazon.com/ec2/v2/home?region=us-west-2#Instances:sort=instanceId\
+\
+       Look for instance with Key Name \'93
+\f1 \cf2 \expnd0\expndtw0\kerning0
+InstashamiOSKeyPair\'94\
+	       
+\f0 \cf0 \kerning1\expnd0\expndtw0 this proves it\'92s running\'85
+\f1 \cf2 \expnd0\expndtw0\kerning0
+\
+
+\f0 \cf0 \kerning1\expnd0\expndtw0 \
+24> Open browser to http://parseplatform.org/\
+\
+       Scroll down to Documents and look for Parse Server Guide, select\
+\
+25>  In LH Menu, look for \'93Using Parse SDKs With Parse Server\'94\
+        Select\
+\
+26>  Look for Swift boilerplate code, copy and past into AppDelegate.swift\'92s 		
+\f3\fs28 \cf3 \cb4 didFinishLaunchingWithOptions 
+\f0\fs24 \cf0 \cb1 \
+         function\'85\
+\
+27> Add import Parse to top of appDelegate swift file, clean and run.\
+\
+       ERROR: No Such Module \'93Parse\'94\
+  \
+       In the lesson, this magically gets fixed by a clean/build, but not here.\
+\
+       See:\
+https://stackoverflow.com/questions/30663180/no-such-module-parse\
+\
+\
+       Tried adding this to Target / Build Settings / Search Paths / Framework Search Paths\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f2 \cf2 \expnd0\expndtw0\kerning0
+$(PROJECT_DIR)
+\f1 \cf2  and 
+\f2 \cf2 $(inherited)\
+\
+DIDN\'92T WORK
+\f0 \cf0 \kerning1\expnd0\expndtw0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \
+\
+       Tried adding direct links to bridging header. Didn\'92t work.\
+\
+      Tried uncommenting first line in pod file:  
+\f1 \cf2 \expnd0\expndtw0\kerning0
+platform :ios, \'939.0\'94\
+
+\f0 \cf0 \kerning1\expnd0\expndtw0         then pod install again,\
+\
+       Re-opened workspace\'85\
+\
+       STILL DOESN\'92T WORK. Same error,  No such module \'93Parse\'94\
+\
+28> OK. 
+\fs22 Tossed
+\fs24  project, started new project.  Pulled in Parse / Bolts Frameworks into Frameworks Group,\
+       Added following iOS frameworks: \
+             SystemConfiguration\
+             CFNetwork\
+             NetworkExtension\
+             AudioToolbox   (some audio frameworks may be redundant)\
+             CoreAudioKit\
+             CoreAudio\
+             libsqlite3.tbd\
+       Now import Parse works!\
+\
+29> Added 
+\f3\fs28 \cf5 \cb4 ParseClientConfiguration / Parse.Initialize  
+\f0\fs24 \cf0 \cb1 calls in AppDelegate / 
+\f3\fs28 \cf3 \cb4 didFinishLaunchingWithOptions\
+\
+30> Went back to AWS EC2 console. \
+
+\f0\fs24 \cf0 \cb1  https://us-west-2.console.aws.amazon.com/ec2/v2/home?region=us-west-2#Instances:sort=instanceId\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f3\fs28 \cf3 \cb4 \
+Selected the 2nd process (don\'92t know why there are 2)\
+Look at bottom for Public DNS (iPv4)\
+\
+NOTE! This address changes if you stop and start a server,\
+it stays the same if you just do a restart?\
+\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f1\fs24 \cf2 \cb1 \expnd0\expndtw0\kerning0
+ec2-18-236-85-237.us-west-2.compute.amazonaws.com\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0 \cf0 \kerning1\expnd0\expndtw0 Open Browser window and go to this addy, should see \'93Parse Dashboard\'94 with login prompt.\
+\
+31>   use this URL to access parse itself:\
+\
+	http://ec2-18-236-85-237.us-west-2.compute.amazonaws.com/parse
+\f1 \cf2 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2           July: Now it is:       \cf6 \outl0\strokewidth0 \strokec6 ec2-52-42-95-208.us-west-2.compute.amazonaws.com\cf2 \outl0\strokewidth0 \
+ 
+\f0 \cf2          paste this URL into the server field in the \cf5 \cb4 \kerning1\expnd0\expndtw0 ParseClientConfiguration \cf2 \cb1 \expnd0\expndtw0\kerning0
+setup in the AppDelegate.\
+\
+32> Go back to EC2 console, look for \'93Connect\'94 tab top center, select it.\
+        Read instructions. Look for \'93chmod\'85\'94 command.\
+\
+33> Go to the terminal window, make sure you are in the Desktop (or wherever the .pem file from step 12 is.\
+\
+        I entered this command:\
+\
+        
+\f2 chmod 400 InstashamiOSKeyPair.pem\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f0 \cf2 \
+34> Look for the ssh command below that in the instructions, copy and paste that into the terminal.\
+\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f2 \cf2 	ssh -i "InstashamiOSKeyPair.pem" ubuntu@ec2-18-236-85-237.us-west-2.compute.amazonaws.com\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f0 \cf2 \
+       \'93Are you sure\'85\'94 comes up, enter \'93yes\'94\
+\
+       You are now logged into the Bitnami Parse Server\
+\
+        This is a full unix shell and responds to normal shell commands.\
+\
+35> In the SERVER SHELL (not the terminal shell) cd to this folder:\
+\
+          cd apps/parse/htdocs\
+\
+36>  use vi editor to modify server.js\
+          about 25 lines down look for two lines starting with appId and masterKey, copy them into the AppDelegate\'92s \
+            ParseClientConfiguration setup as so:\
+      \
+         
+\f3\fs28 \cf3 \cb4 \kerning1\expnd0\expndtw0       $0.\cf5 applicationId\cf3  = \cf7 "af374cf7c9c0ad32af16e6c6ef4e8e0435f36670"
+\f0\fs24 \cf0 \
+\pard\tx692\pardeftab692\pardirnatural\partightenfactor0
+
+\f3\fs28 \cf3           $0.\cf5 clientKey\cf3  = \cf7 "c0cef5648663d06d6087a4cceeae36d72931b0ca"\
+\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f0\fs24 \cf2 \cb1 \expnd0\expndtw0\kerning0
+37>  OK. Tried running with simple PFObject save in ViewController:\
+\
+\pard\tx692\pardeftab692\pardirnatural\partightenfactor0
+
+\f3\fs28 \cf8 \cb4 \kerning1\expnd0\expndtw0 let\cf3  gameScore = \cf5 PFObject\cf3 (className:\cf7 "GameScore"\cf3 )
+\f0\fs24 \cf0 \
+\pard\tx692\pardeftab692\pardirnatural\partightenfactor0
+
+\f3\fs28 \cf3         gameScore[\cf7 "score"\cf3 ] = \cf9 1337
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3         gameScore[\cf7 "playerName"\cf3 ] = \cf7 "Sean Plott"
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3         gameScore[\cf7 "cheatMode"\cf3 ] = \cf8 false
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3         gameScore.\cf10 saveInBackground\cf3  \{
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3             (success: \cf11 Bool\cf3 , error: \cf11 Error\cf3 ?) \cf8 in
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3             \cf8 if\cf3  (success) \{
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3                 \cf12 print\cf3 (\cf7 "success"\cf3 )
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3             \} \cf8 else\cf3  \{
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3                 \cf12 print\cf3 (\cf7 "error saving to db"\cf3 )
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3                 \cf13 // There was a problem, check error.description
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3             \}
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3         \}\
+\
+\pard\tx692\pardeftab692\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf2 \cb1 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 38>  FAILED. In the lesson it succeeded. Here is the error:\
+\pard\tx692\pardeftab692\pardirnatural\partightenfactor0
+
+\f4\b\fs28 \cf3 \kerning1\expnd0\expndtw0 \CocoaLigature0 \
+[Error]: The resource could not be loaded because the App Transport Security policy requires the use of a secure connection. (Code: 100, Version: 1.14.2)\
+\
+Had to add this to the info.plist file:\
+\pard\tx692\pardeftab692\pardirnatural\partightenfactor0
+
+\f3\b0 \cf3 \cb4 \CocoaLigature1     \cf8 <key>\cf3 NSAppTransportSecurity\cf8 </key>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3     \cf8 <dict>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3         \cf8 <key>\cf3 NSAllowsArbitraryLoads\cf8 </key>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3         \cf8 <false/>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3         \cf8 <key>\cf3 NSExceptionDomains\cf8 </key>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3         \cf8 <dict>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3             \cf8 <key>\cf3 amazonaws.com\cf8 </key>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3             \cf8 <dict>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3                 \cf8 <key>\cf3 NSTemporaryExceptionAllowsInsecureHTTPLoads\cf8 </key>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3                 \cf8 <true/>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3                 \cf8 <key>\cf3 NSIncludesSubdomains\cf8 </key>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3                 \cf8 <true/>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3                 \cf8 <key>\cf3 NSThirdPartyExceptionRequiresForwardSecrecy\cf8 </key>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3                 \cf8 <false/>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3             \cf8 </dict>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3         \cf8 </dict>
+\f0\fs24 \cf0 \
+
+\f3\fs28 \cf3     \cf8 </dict>
+\f0\fs24 \cf0 \
+\
+\
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \cb1 \expnd0\expndtw0\kerning0
+39>  Success. Db stored new record OK!\
+\
+40>  Go back to the terminal, which should still be logged into the parse server.  \
+	Make sure the server.js file is open from step 36>\cf0 \cb4 \kerning1\expnd0\expndtw0 \
+\cf2 \cb1 \expnd0\expndtw0\kerning0
+\
+        Look for users: down below where you just were, use the \'93a\'94 (or \'93i\'94) \
+	command to modify the user, i made it \'93davesky\'94\\\
+\
+41> To change the encrypted password, open new browser window and goto:\
+\
+        https://bcrypt-generator.com/\
+\
+        My pw is dogdog12!.\
+        Enter pw, press greeh Hash button.\
+        Copy the long hash key which comes out below, and go to the end of the\
+        pass: field, delete the old long string and paste the new one  \'85\
+           (make sure to have quotes around it)\
+\
+        save file by pressing escape  and then :wq!\
+\
+42> Go back to EC2 console, dismiss popup if it is still up. Select the right process and reboot it.\
+         Choose \'93Actions / Instance State / Reboot\'94\
+         and  select blue \'93Yes, Reboot\'94 button\
+\
+       This is so the new login and password will take.\
+\
+ 43> Make sure server is up, open new Browser window and enter this URL\
+	   (or whatever you had above to test earlier)\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \kerning1\expnd0\expndtw0 	http://ec2-18-236-85-237.us-west-2.compute.amazonaws.com/parse\cf2 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \
+         You should see this:\
+          
+\f2 \{"error":"unauthorized"\}\
+
+\f0 \
+ 44> Server is back up! Try logging in now from the Parse with this addy:\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf0 \kerning1\expnd0\expndtw0 		http://ec2-18-236-85-237.us-west-2.compute.amazonaws.com\
+         You should see a login prompt, enter username / pw from steps 40> / 41>\
+\
+45>  You should see the ORIGINAL parse UI from 2 years ago.\
+         Select \'93My Bitnami Parse API\'94,\
+\
+         Under Browser at left, look for the GameScore table, select it.\
+         You should see one row that was just created.\
+\
+\
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+\cf2 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \
+\
+\
+\
+\pard\pardeftab720\sl280\partightenfactor0
+
+\f1 \cf2 \
+\
+\
+\
+\
+\
+}

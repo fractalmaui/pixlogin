@@ -1,0 +1,105 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf830
+{\fonttbl\f0\fmodern\fcharset0 Courier;\f1\fnil\fcharset0 Menlo-Bold;\f2\fnil\fcharset0 Menlo-Regular;
+}
+{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red47\green180\blue29;\red255\green255\blue255;
+\red0\green0\blue0;\red64\green11\blue217;}
+{\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\cssrgb\c20238\c73898\c14947;\csgray\c100000;
+\csgray\c0;\cssrgb\c32308\c18668\c88227;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{hyphen\}}{\leveltext\leveltemplateid1\'01\uc0\u8259 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
+\margl1440\margr1440\vieww21780\viewh12640\viewkind0
+\deftab720
+\pard\tx220\tx720\pardeftab720\li720\fi-720\sl280\partightenfactor0
+\ls1\ilvl0
+\f0\fs24 \cf2 {\listtext	\uc0\u8259 	}\expnd0\expndtw0\kerning0
+##### Email verification and password reset\
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \
+Verifying user email addresses and enabling password reset via email requries an email adapter. As part of the `parse-server` package we provide an adapter for sending email through Mailgun. To use it, sign up for Mailgun, and add this to your initialization code:\
+\
+```js\
+var server = ParseServer(\{\
+  ...otherOptions,\
+  // Enable email verification\
+  verifyUserEmails: true,\
+\
+  // set preventLoginWithUnverifiedEmail to false to allow user to login without verifying their email\
+  // set preventLoginWithUnverifiedEmail to true to prevent user from login if their email is not verified\
+  preventLoginWithUnverifiedEmail: false, // defaults to false\
+\
+  // The public URL of your app.\
+  // This will appear in the link that is used to verify email addresses and reset passwords.\
+  // Set the mount path as it is in serverURL\
+  publicServerURL: 'https://example.com/parse',\
+  // Your apps name. This will appear in the subject and body of the emails that are sent.\
+  appName: 'Parse App',\
+  // The email adapter\
+  emailAdapter: \{\
+    module: 'parse-server-simple-mailgun-adapter',\
+    options: \{\
+      // The address that your emails come from\
+      fromAddress: 'parse@example.com',\
+      // Your domain from mailgun.com\
+      domain: 'example.com',\
+      // Your API key from mailgun.com\
+      apiKey: 'key-mykey',\
+    \}\
+  \}\
+\});\
+\
+\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\b\fs22 \cf3 \cb4 \kerning1\expnd0\expndtw0 \CocoaLigature0 bitnami@ip-172-31-26-219
+\f2\b0 \cf5 \cb4 :
+\f1\b \cf6 \cb4 ~/apps/parse/conf/node_modules/parse-server
+\f2\b0 \cf5 \cb4 $
+\f0\fs24 \cf2 \cb1 \expnd0\expndtw0\kerning0
+\CocoaLigature1 \
+\pard\pardeftab720\sl280\partightenfactor0
+\cf2 \'85from README.md:\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f2\fs22 \cf5 \cb4 \kerning1\expnd0\expndtw0 \CocoaLigature0 ```js\
+var server = ParseServer(\{\
+  ...otherOptions,\
+  // Enable email verification\
+  verifyUserEmails: true,\
+\
+  // if `verifyUserEmails` is `true` and\
+  //     if `emailVerifyTokenValidityDuration` is `undefined` then\
+  //        email verify token never expires\
+  //     else\
+  //        email verify token expires after `emailVerifyTokenValidityDuration`\
+  //\
+  // `emailVerifyTokenValidityDuration` defaults to `undefined`\
+  //\
+  // email verify token below expires in 2 hours (= 2 * 60 * 60 == 7200 seconds)\
+  emailVerifyTokenValidityDuration: 2 * 60 * 60, // in seconds (2 hours = 7200 seconds)\
+\
+  // set preventLoginWithUnverifiedEmail to false to allow user to login without verifying their email\
+  // set preventLoginWithUnverifiedEmail to true to prevent user from login if their email is not verified\
+  preventLoginWithUnverifiedEmail: false, // defaults to false\
+\
+  // The public URL of your app.\
+  // This will appear in the link that is used to verify email addresses and reset passwords.\
+  // Set the mount path as it is in serverURL\
+  publicServerURL: 'https://example.com/parse',\
+  // Your apps name. This will appear in the subject and body of the emails that are sent.\
+  appName: 'Parse App',\
+  // The email adapter\
+  emailAdapter: \{\
+    module: '@parse/simple-mailgun-adapter',\
+    options: \{\
+      // The address that your emails come from\
+      fromAddress: 'parse@example.com',\
+      // Your domain from mailgun.com\
+      domain: 'example.com',\
+      // Your API key from mailgun.com\
+      apiKey: 'key-mykey',\
+    \}\
+  \},\
+\
+}
