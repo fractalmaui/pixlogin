@@ -53,11 +53,11 @@ NSString * testMode;
             // fbc.fbName = PFUser.currentUser.username;
             // fbc.fbProfileImage = profileImage;
             // [fbc addPortrait : PFUser.currentUser.objectId : PFUser.currentUser.username : profileImage];
-            [_loginButton setBackgroundImage:profileImage forState:UIControlStateNormal];
+            [self.loginButton setBackgroundImage:profileImage forState:UIControlStateNormal];
         }];
     }
     
-    _instrsLabel.text = @"[Onboarding Test] simulates first time through.\n\nPress vanGogh icon to simulate login to existing account";
+    _instrsLabel.text = @"[Signup] Runs Signup Test.\n\nPress vanGogh icon to Login to existing account";
 }
 
 //==========loginTestVC=========================================================================
@@ -80,7 +80,7 @@ NSString * testMode;
 //==========loginTestVC=========================================================================
 - (IBAction)onboardTestSelect:(id)sender
 {
-    testMode = @"onboarding";
+    testMode = @"signup";
     [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
 
 }
@@ -102,7 +102,7 @@ NSString * testMode;
                                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                   NSLog(@" logout here...");
                                                                   [PFUser logOut];
-                                                                  [_loginButton setBackgroundImage:[UIImage imageNamed:@"vangogh120"] forState:nil];
+                                                                  [self.loginButton setBackgroundImage:[UIImage imageNamed:@"vangogh120"] forState:nil];
 
                                                               }];
         UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)

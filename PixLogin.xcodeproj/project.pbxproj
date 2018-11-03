@@ -29,8 +29,6 @@
 		72EEABEC21229D0900ED319F /* vangogh120.png in Resources */ = {isa = PBXBuildFile; fileRef = 72EEABEB21229D0900ED319F /* vangogh120.png */; };
 		72F18E6920BF096F0039CD38 /* 4colorLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F18E6520BF096E0039CD38 /* 4colorLogo.png */; };
 		72F18E6A20BF096F0039CD38 /* br.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 72F18E6620BF096E0039CD38 /* br.jpeg */; };
-		72F18E6B20BF096F0039CD38 /* vangogh120.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F18E6720BF096E0039CD38 /* vangogh120.png */; };
-		72F18E6C20BF096F0039CD38 /* LogoText.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F18E6820BF096F0039CD38 /* LogoText.png */; };
 		72FA5C7620B323E500B1A4AF /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 72FA5C7520B323E500B1A4AF /* AppDelegate.m */; };
 		72FA5C7920B323E500B1A4AF /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 72FA5C7820B323E500B1A4AF /* ViewController.m */; };
 		72FA5C7C20B323E500B1A4AF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 72FA5C7A20B323E500B1A4AF /* Main.storyboard */; };
@@ -78,7 +76,6 @@
 		72EEABEB21229D0900ED319F /* vangogh120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vangogh120.png; sourceTree = "<group>"; };
 		72F18E6520BF096E0039CD38 /* 4colorLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 4colorLogo.png; path = Resources/4colorLogo.png; sourceTree = SOURCE_ROOT; };
 		72F18E6620BF096E0039CD38 /* br.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = br.jpeg; path = Resources/br.jpeg; sourceTree = SOURCE_ROOT; };
-		72F18E6720BF096E0039CD38 /* vangogh120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = vangogh120.png; path = Resources/vangogh120.png; sourceTree = SOURCE_ROOT; };
 		72F18E6820BF096F0039CD38 /* LogoText.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogoText.png; path = Resources/LogoText.png; sourceTree = SOURCE_ROOT; };
 		72FA5C7120B323E500B1A4AF /* PixLogin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PixLogin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		72FA5C7420B323E500B1A4AF /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -128,7 +125,6 @@
 				72F18E6520BF096E0039CD38 /* 4colorLogo.png */,
 				72F18E6620BF096E0039CD38 /* br.jpeg */,
 				72F18E6820BF096F0039CD38 /* LogoText.png */,
-				72F18E6720BF096E0039CD38 /* vangogh120.png */,
 				726B2D3420BE71540050FF76 /* emptyUser.png */,
 				726B2D3320BE71540050FF76 /* LogoText.png */,
 				72AB0B7920C043CC00E852C4 /* monet.png */,
@@ -253,7 +249,7 @@
 		72FA5C6920B323E500B1A4AF /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = huedoku;
 				TargetAttributes = {
 					72FA5C7020B323E500B1A4AF = {
@@ -301,8 +297,6 @@
 				72F18E6A20BF096F0039CD38 /* br.jpeg in Resources */,
 				726B2D3620BE71540050FF76 /* LogoText.png in Resources */,
 				72FA5C7E20B323E500B1A4AF /* Assets.xcassets in Resources */,
-				72F18E6C20BF096F0039CD38 /* LogoText.png in Resources */,
-				72F18E6B20BF096F0039CD38 /* vangogh120.png in Resources */,
 				726B2D2D20BE709D0050FF76 /* Albers.png in Resources */,
 				72EEABEC21229D0900ED319F /* vangogh120.png in Resources */,
 				726B2D2F20BE709D0050FF76 /* nelson256.png in Resources */,
@@ -386,6 +380,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -393,6 +388,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -441,6 +437,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -448,6 +445,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

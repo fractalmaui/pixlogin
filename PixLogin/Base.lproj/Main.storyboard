@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina3_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
-        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -62,12 +61,15 @@
                                     <constraint firstAttribute="width" constant="114" id="fUA-KC-BgA"/>
                                     <constraint firstAttribute="width" secondItem="wrQ-Ag-28o" secondAttribute="height" multiplier="19:5" id="tDe-vD-gRI"/>
                                 </constraints>
-                                <state key="normal" title="Onboarding Test"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <state key="normal" title="Signup">
+                                    <color key="titleColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
                                 <connections>
                                     <action selector="onboardTestSelect:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ziO-IK-9Zt"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nMh-fm-iyf">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nMh-fm-iyf">
                                 <rect key="frame" x="12" y="201" width="296" height="200"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
@@ -165,7 +167,7 @@
                                         </constraints>
                                     </view>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Kfr-l9-8Jx">
-                                        <rect key="frame" x="102" y="10" width="115" height="36"/>
+                                        <rect key="frame" x="102.5" y="10" width="115" height="36"/>
                                         <color key="backgroundColor" red="0.20390012860000001" green="0.20393526549999999" blue="0.2038924694" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="Kfr-l9-8Jx" secondAttribute="height" multiplier="16:5" id="298-0P-Hma"/>
@@ -371,7 +373,7 @@ or choose from below</string>
                                         <textInputTraits key="textInputTraits" spellCheckingType="no" textContentType="username"/>
                                     </textField>
                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Email:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IWo-WZ-aei" userLabel="Email Label">
-                                        <rect key="frame" x="136" y="55" width="47.5" height="28"/>
+                                        <rect key="frame" x="136.5" y="55" width="47.5" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="lessThanOrEqual" constant="190" id="5z5-Px-4dZ"/>
                                             <constraint firstAttribute="height" constant="28" id="O3F-rq-ca6"/>
@@ -390,7 +392,7 @@ or choose from below</string>
                                         <textInputTraits key="textInputTraits" spellCheckingType="no" keyboardType="emailAddress"/>
                                     </textField>
                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Password:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v7P-KL-M39">
-                                        <rect key="frame" x="119" y="110" width="81" height="28"/>
+                                        <rect key="frame" x="119.5" y="110" width="81" height="28"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="28" id="si7-mV-bHa"/>
                                             <constraint firstAttribute="width" relation="lessThanOrEqual" constant="190" id="uoV-Lx-g6b"/>
@@ -544,6 +546,7 @@ or choose from below</string>
                         <viewLayoutGuide key="safeArea" id="Mqn-OC-mlL"/>
                     </view>
                     <connections>
+                        <outlet property="activityInfoLabel" destination="hiP-cC-0io" id="r9I-Y5-huD"/>
                         <outlet property="activityView" destination="o8y-SY-3gC" id="3js-zM-KTj"/>
                         <outlet property="anonymousButton" destination="Lu9-GG-WmH" id="ZcN-2d-NZ2"/>
                         <outlet property="background" destination="1VD-sF-v2p" id="EFV-0t-2vW"/>

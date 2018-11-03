@@ -35,6 +35,8 @@
     
     UIImage *bkgdTropo;
     UIImage *bkgdTilt;
+    
+    BOOL signupError;
 
 }
 @property (weak, nonatomic) IBOutlet UIImageView *obscura;
@@ -62,6 +64,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *pwLabel;
 @property (weak, nonatomic) IBOutlet UIView *activityView;
+@property (weak, nonatomic) IBOutlet UILabel *activityInfoLabel;
 
 
 - (IBAction)resetPasswordSelect:(id)sender;
