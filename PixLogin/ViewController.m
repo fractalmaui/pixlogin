@@ -33,9 +33,8 @@ NSString * testMode;
     [super viewWillAppear:animated];
     if ([PFUser currentUser] != nil) //already logged in?
     {
-        NSLog(@"Logged in at start!");
+        //NSLog(@" Logged in at start:userobjectid %@",PFUser.currentUser.objectId);
         PFUser *user = PFUser.currentUser;
-        NSLog(@" userobjectid %@",PFUser.currentUser.objectId);
         NSString *duh = PFUser.currentUser.username;
         PFFile *pff = user[@"userPortrait"]; //replace with portraitkey at integrate time
         [pff getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
@@ -57,7 +56,7 @@ NSString * testMode;
         }];
     }
     
-    _instrsLabel.text = @"[Signup] Runs Signup Test.\n\nPress vanGogh icon to Login to existing account";
+    _instrsLabel.text = @"[Signup] Runs Signup Test.\n\nPress vanGogh icon to Login to existing account\nIf Van Gogh is not there then select it and log out first before testing";
 }
 
 //==========loginTestVC=========================================================================
@@ -80,7 +79,7 @@ NSString * testMode;
 //==========loginTestVC=========================================================================
 - (IBAction)onboardTestSelect:(id)sender
 {
-    testMode = @"signup";
+    testMode = PL_SIGNUP_MODE;
     [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
 
 }
@@ -100,23 +99,32 @@ NSString * testMode;
         
         UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Logout",nil)
                                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                                  NSLog(@" logout here...");
+                                                                  //NSLog(@" logout here...");
                                                                   [PFUser logOut];
                                                                   [self.loginButton setBackgroundImage:[UIImage imageNamed:@"vangogh120"] forState:nil];
 
                                                               }];
-        UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
+        UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Change Your Avatar",nil)
+                                                              style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                                  //NSLog(@" new avatar...");
+                                                                  testMode = PL_AVATAR_MODE;
+                                                                  
+                                                                  [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
+                                                                  
+                                                              }];
+        UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Cancel",nil)
                                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                  // [_sfx makeTicSoundWithPitch : 8 : 51];
                                                               }];
         [alert addAction:firstAction];
         [alert addAction:secondAction];
+        [alert addAction:thirdAction];
         [self presentViewController:alert animated:YES completion:nil];
 
     }
     else //Not logged in: signup/login
     {
-        testMode = @"login";
+        testMode = PL_LOGIN_MODE;
 
         [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
     }

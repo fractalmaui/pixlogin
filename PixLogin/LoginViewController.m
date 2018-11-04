@@ -91,12 +91,17 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     [super viewDidAppear:animated];
     if (!returningFromPhotoPicker) //Entering this UI first time?
     {
-        if ([_entryMode containsString : @"signup"])
+        if ([_entryMode containsString : PL_SIGNUP_MODE])
         {
             page = 0;
             [self firstPage];
         }
-        else if ([_entryMode containsString : @"login"])  //Login for returning user?
+        else if ([_entryMode containsString : PL_AVATAR_MODE])  //Change user avatar?
+        {
+            page = 2;
+            [self thirdPage];
+        }
+        else if ([_entryMode containsString : PL_LOGIN_MODE])  //Login for returning user?
         {
             page = 4;
             [self fifthPage];
@@ -157,7 +162,7 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 //----LoginViewController---------------------------------
 -(void) gotoNextPage
 {
-    NSLog(@" nextpage %d vs %d",page,lastPage);
+    //NSLog(@" nextpage %d vs %d",page,lastPage);
     //Do we need to perform login / signup ???
     if (page == 1) //Page 1 just has login/signup buttons now
     {
@@ -257,7 +262,7 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 // Opener...
 -(void) firstPage
 {
-    NSLog(@" page 1");
+    //NSLog(@" page 1");
     animating = TRUE;
     _leftButton.hidden  = TRUE;
     _rightButton.hidden = TRUE;
@@ -269,10 +274,11 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     _background.image  = bkgdTropo;
     _bottomLabel.text  = @"";
 
-   // _welcomeLabel.textColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"vangogh120"]];
+    //Interesting test?
+   _welcomeLabel.textColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"hspectrum2"]];
     
     BOOL login_hidden = TRUE;
-    if ([_entryMode containsString : @"signup"]) //This should be the ONLY entry mode!
+    if ([_entryMode containsString : PL_SIGNUP_MODE]) //This should be the ONLY entry mode!
     {
         _welcomeLabel.text = @"Add your\nColor Profile";
         _bottomLabel.text = @"to create\nbrilliant puzzles";
@@ -310,6 +316,10 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     _resetPasswordButton.hidden = TRUE;
     _background.image     = bkgdTilt;
     _bottomLabel.hidden   = FALSE;
+    
+    //Test coloring label...
+    _welcomeLabel.textColor = [UIColor whiteColor];
+
 
     [_leftButton setTitle:@"cancel" forState:UIControlStateNormal];
 
@@ -339,10 +349,20 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     _chooseLabel.hidden  = FALSE;
     _faceView.hidden     = FALSE;
 
+    if ([_entryMode containsString : PL_AVATAR_MODE])
+    {
+        if (!returningFromPhotoPicker) [self loadCurrentUserInfo];
+        [_leftButton setTitle:@"cancel" forState:UIControlStateNormal];
+        [_rightButton setTitle:@"save" forState:UIControlStateNormal];
+    }
+    else
+    {
+        [_leftButton setTitle:@"back" forState:UIControlStateNormal];
+        [_rightButton setTitle:@"next" forState:UIControlStateNormal];
+    }
+    
     animating = TRUE;
     _welcomeLabel.text = [NSString stringWithFormat:@"%@\n",_userName]; // add linefeed to keep label at top of its VP
-   // _portraitImage.image = [UIImage imageNamed:@"emptyUser"];
-    [_rightButton setTitle:@"next" forState:UIControlStateNormal];
 
     //This animates obscura OUT...
     [self animateInOut:_obscura       : 0 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
@@ -359,6 +379,51 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 
 } //end thirdPage
 
+//----LoginViewController---------------------------------
+-(void) updateCurrentUserInfo
+{
+    PFUser *user = PFUser.currentUser;
+    NSData *avatarData = UIImagePNGRepresentation(avatarImage);
+    PFFile *avatarImageFile = [PFFile fileWithName : @"avatarImage.png" data:avatarData];
+    user[_PuserPortraitKey] = avatarImageFile;
+    _activityInfoLabel.text = @"Updating your profile";
+    _activityView.hidden = FALSE;
+    [ai startAnimating];
+    [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded)
+        {
+            self->_activityView.hidden = TRUE;
+            [self->ai stopAnimating];
+            [self dismissViewControllerAnimated : YES completion:nil];
+        }
+        else
+        {
+            [self pixAlertDEBUG:self :@"Could not save Avatar" : error.localizedDescription :false];
+        }
+    }];
+    
+} //end updateCurrentUserInfo
+
+//----LoginViewController---------------------------------
+-(void) loadCurrentUserInfo
+{
+    PFUser *user = PFUser.currentUser;
+    _userName    = PFUser.currentUser.username;
+    avatarImage  = [UIImage imageNamed:@"vangogh120"];
+    PFFile *pff  = user[@"userPortrait"]; //replace with portraitkey at integrate time
+    [pff getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
+        if (error)
+        {
+            NSLog(@" error fetching avatar...");
+        }
+        else
+        {
+            self->avatarImage = [UIImage imageWithData:data];
+        }
+        self->_portraitImage.image = self->avatarImage;
+    }];
+
+} //end loadCurrentUserInfo
 
 //----LoginViewController---------------------------------
 // Password Time...
@@ -407,7 +472,7 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     _emailText.hidden     = TRUE;
     _pwLabel.hidden       = FALSE;
     _pwText.hidden        = FALSE;
-    
+    _rightButton.hidden   = FALSE; //May have been hidden by pw reset
     _nameText.text  = @"davesky";
     _pwText.text    = @"asdfasdf";
     
@@ -524,7 +589,7 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     }
     //Addy legal? Try reset!
     _activityView.hidden = FALSE;
-    
+    _activityInfoLabel.text = @"Sending Email";
     [ai startAnimating];
     
     [UIApplication.sharedApplication beginIgnoringInteractionEvents];
@@ -532,19 +597,17 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
          block:^(BOOL succeeded, NSError *error) {
              if (!error)
              {
-                 NSLog(@" reset OK");
                  [self pixAlertDEBUG:self :@"Reset Successful" : @"Check your email to complete the password reset process." :false];
              }
              else
              {
-                 NSLog(@"reset err:%@", [error userInfo]);
                  [self pixAlertDEBUG:self :@"Reset Failed" : error.localizedDescription :false];
              }
              self->_activityView.hidden = TRUE;
              [self->ai stopAnimating];
              [UIApplication.sharedApplication endIgnoringInteractionEvents];
-             [self reset];
-             [self firstPage];
+             self->_resetPasswordButton.hidden = TRUE;
+             [self fifthPage]; //Go to Login page now...
          }];
 } //end resetPasswordSelect
 
@@ -621,13 +684,19 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 //----LoginViewController---------------------------------
 // Cancel / Back button...
 - (IBAction)leftSelect:(id)sender {
+    BOOL bailit = FALSE;
     if (page == 1)
     {
       [self anonymousInfoAlert:self];
     }
+    else if (page == 2)  //Avatar Page
+    {
+        if ([_entryMode containsString : PL_AVATAR_MODE]) bailit = TRUE;
+    }
     else if (page == 4)  //Login cancel? Bail!
     {
-        [self dismissViewControllerAnimated : YES completion:nil];
+        [PFUser logOut];   //shoould this be conditional on logged in status?
+        bailit = TRUE;  // can i get login status from pfuser?
     }
     else
     {
@@ -635,14 +704,23 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
         NSLog(@" go back one page??.., page %d",page);
         [self gotoPreviousPage];
     }
+    if (bailit) [self dismissViewControllerAnimated : YES completion:nil];
 
-}
+} //end leftSelect
 
 //----LoginViewController---------------------------------
 - (IBAction)rightSelect:(id)sender
 {
-    NSLog(@" right button hit...");
-    [self gotoNextPage];
+    //NSLog(@" right button hit...");
+    if (page == 2 && [_entryMode containsString : PL_AVATAR_MODE])  //Avatar Page
+    {
+        [self updateCurrentUserInfo];
+    }
+    else
+    {
+        [self gotoNextPage];
+    }
+
 
 }
 
@@ -751,8 +829,6 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
                                     actionWithTitle:@"OK"
                                     style:UIAlertActionStyleDefault
                                     handler:^(UIAlertAction * action) {
-                                        //Handle your yes please button action here
-                                        NSLog(@" OK select...page %d",self->page); //asdf
                                         if (self->page == 3 && !self->signupError) //Signup...
                                         {
                                             self->page = 4;
@@ -802,24 +878,28 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
             }
             else
             {
-                NSLog(@"user logged in...");
-                NSLog(@" userobjectid %@",PFUser.currentUser.objectId);
+                //NSLog(@"user logged in... id %@",PFUser.currentUser.objectId);
                 bailit = true;
             }
         }
         else
         {
             [self pixAlertDEBUG:self :@"Error Logging In" : error.localizedDescription :false];
-            //self->failCount++;
-            if (self->failCount > 2) //Third fail? OUCH! We need a reset!
+            self->failCount++;
+            if (self->failCount > 1) //Third fail? OUCH! We need a reset!
             {
                 //Reconfigure UI for email reset...
-                self->_emailText.hidden = FALSE;
                 self->_resetPasswordButton.hidden = FALSE;
-                self->_nameText.hidden = TRUE;
-                self->_pwText.hidden = TRUE;
-                
-                self->_welcomeLabel.text = @"Enter Email";
+                self->_emailLabel.hidden  = FALSE;
+                self->_emailText.hidden   = FALSE;
+                self->_nameLabel.hidden   = TRUE;
+                self->_nameText.hidden    = TRUE;
+                self->_pwLabel.hidden     = TRUE;
+                self->_pwText.hidden      = TRUE;
+                self->_rightButton.hidden = TRUE;
+                self->_welcomeLabel.text  = @"";
+                self->_bottomLabel.text   = @"Enter your Email address.\nWe will send you a password reset.";
+                self->_bottomLabel.hidden = FALSE;
             }
         }
         self->_activityView.hidden = TRUE;
@@ -841,7 +921,6 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     NSData *avatarData = UIImagePNGRepresentation(avatarImage);
     PFFile *avatarImageFile = [PFFile fileWithName : @"avatarImage.png" data:avatarData];
     user[_PuserPortraitKey] = avatarImageFile;
-    //  user.email    = _userName;  //Omit: need dog@kat.com formatted email here or it fails
     _activityInfoLabel.text = @"Creating your profile";
     _activityView.hidden = FALSE;
     [ai startAnimating];
@@ -851,7 +930,7 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
         if (error != nil)
         {
             [self pixAlertDEBUG:self :@"Error Signing Up" : error.localizedDescription :false];
-            signupError = TRUE;
+            self->signupError = TRUE;
         }
         else
         {
@@ -870,10 +949,9 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 //==========loginTestVC=========================================================================
 - (BOOL)validateEmailWithString:(NSString*)emailIn
 {
-    NSLog(@"validate email %@.....",emailIn);
+    //NSLog(@"validate email %@.....",emailIn);
     NSString *emailRegex = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
     NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
-//    BOOL isgood = [emailTest evaluateWithObject:emailIn];
     return [emailTest evaluateWithObject:emailIn];
 }
 
@@ -895,8 +973,8 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 //==========loginTestVC=========================================================================
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    NSLog(@" ended editing txt %@",textField);
-    NSLog(@" annnd text is %@",textField.text);
+    //NSLog(@" ended editing txt %@",textField);
+    //NSLog(@" annnd text is %@",textField.text);
     
 }
 

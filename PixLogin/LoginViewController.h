@@ -14,6 +14,10 @@
 #define PORTRAIT_PERCENT 50
 #define LOGIN_AVATAR_SIZE 128
 
+#define PL_SIGNUP_MODE @"signup"
+#define PL_LOGIN_MODE  @"login"
+#define PL_AVATAR_MODE @"avatar"
+
 @interface LoginViewController : UIViewController
         <UINavigationControllerDelegate,  UIImagePickerControllerDelegate , UITextFieldDelegate>
 {
