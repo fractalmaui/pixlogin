@@ -17,6 +17,7 @@
 		726B2D3520BE71540050FF76 /* tiltbkgd.png in Resources */ = {isa = PBXBuildFile; fileRef = 726B2D3220BE71540050FF76 /* tiltbkgd.png */; };
 		726B2D3620BE71540050FF76 /* LogoText.png in Resources */ = {isa = PBXBuildFile; fileRef = 726B2D3320BE71540050FF76 /* LogoText.png */; };
 		726B2D3720BE71540050FF76 /* emptyUser.png in Resources */ = {isa = PBXBuildFile; fileRef = 726B2D3420BE71540050FF76 /* emptyUser.png */; };
+		727C40E321AF5D5700B9020A /* HDKGenerate.m in Sources */ = {isa = PBXBuildFile; fileRef = 727C40E121AF5D5600B9020A /* HDKGenerate.m */; };
 		727ECD4920C1711B00208436 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 727ECD4820C1711B00208436 /* Parse.framework */; };
 		727ECD4B20C171AF00208436 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 727ECD4A20C171AF00208436 /* libsqlite3.tbd */; };
 		727ECD4D20C171D100208436 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 727ECD4C20C171D100208436 /* CoreAudio.framework */; };
@@ -28,6 +29,10 @@
 		72AB0B7D20C049AF00E852C4 /* UIImageExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AB0B7C20C049AF00E852C4 /* UIImageExtras.m */; };
 		72B1869E218F101D00CD4C5A /* hspectrum.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B1869D218F101D00CD4C5A /* hspectrum.png */; };
 		72B186A0218F109400CD4C5A /* hspectrum2.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B1869F218F109400CD4C5A /* hspectrum2.png */; };
+		72BCF43221ADBBEE00102205 /* t03.png in Resources */ = {isa = PBXBuildFile; fileRef = 72BCF42F21ADBBEB00102205 /* t03.png */; };
+		72BCF43321ADBBEE00102205 /* t02.png in Resources */ = {isa = PBXBuildFile; fileRef = 72BCF43021ADBBEC00102205 /* t02.png */; };
+		72BCF43421ADBBEE00102205 /* t01.png in Resources */ = {isa = PBXBuildFile; fileRef = 72BCF43121ADBBED00102205 /* t01.png */; };
+		72BCF43A21ADBC3C00102205 /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72BCF43921ADBC3C00102205 /* SpriteKit.framework */; };
 		72EEABEC21229D0900ED319F /* vangogh120.png in Resources */ = {isa = PBXBuildFile; fileRef = 72EEABEB21229D0900ED319F /* vangogh120.png */; };
 		72F18E6920BF096F0039CD38 /* 4colorLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F18E6520BF096E0039CD38 /* 4colorLogo.png */; };
 		72F18E6A20BF096F0039CD38 /* br.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 72F18E6620BF096E0039CD38 /* br.jpeg */; };
@@ -62,6 +67,8 @@
 		726B2D3220BE71540050FF76 /* tiltbkgd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = tiltbkgd.png; path = Resources/tiltbkgd.png; sourceTree = SOURCE_ROOT; };
 		726B2D3320BE71540050FF76 /* LogoText.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = LogoText.png; path = Resources/LogoText.png; sourceTree = SOURCE_ROOT; };
 		726B2D3420BE71540050FF76 /* emptyUser.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = emptyUser.png; path = Resources/emptyUser.png; sourceTree = SOURCE_ROOT; };
+		727C40E121AF5D5600B9020A /* HDKGenerate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HDKGenerate.m; sourceTree = "<group>"; };
+		727C40E221AF5D5600B9020A /* HDKGenerate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HDKGenerate.h; sourceTree = "<group>"; };
 		727ECD4820C1711B00208436 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Parse.framework; path = 3rdParty/Parse.framework; sourceTree = SOURCE_ROOT; };
 		727ECD4A20C171AF00208436 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		727ECD4C20C171D100208436 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
@@ -77,6 +84,11 @@
 		72AB0B7C20C049AF00E852C4 /* UIImageExtras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageExtras.m; sourceTree = "<group>"; };
 		72B1869D218F101D00CD4C5A /* hspectrum.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hspectrum.png; path = Resources/hspectrum.png; sourceTree = SOURCE_ROOT; };
 		72B1869F218F109400CD4C5A /* hspectrum2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hspectrum2.png; path = Resources/hspectrum2.png; sourceTree = SOURCE_ROOT; };
+		72BCF42F21ADBBEB00102205 /* t03.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = t03.png; sourceTree = "<group>"; };
+		72BCF43021ADBBEC00102205 /* t02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = t02.png; sourceTree = "<group>"; };
+		72BCF43121ADBBED00102205 /* t01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = t01.png; sourceTree = "<group>"; };
+		72BCF43921ADBC3C00102205 /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
+		72BCF43D21ADBCDA00102205 /* PixLogin-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PixLogin-Bridging-Header.h"; sourceTree = "<group>"; };
 		72EEABEB21229D0900ED319F /* vangogh120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vangogh120.png; sourceTree = "<group>"; };
 		72F18E6520BF096E0039CD38 /* 4colorLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 4colorLogo.png; path = Resources/4colorLogo.png; sourceTree = SOURCE_ROOT; };
 		72F18E6620BF096E0039CD38 /* br.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = br.jpeg; path = Resources/br.jpeg; sourceTree = SOURCE_ROOT; };
@@ -101,6 +113,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72BCF43A21ADBC3C00102205 /* SpriteKit.framework in Frameworks */,
 				727ECD5520C1722800208436 /* SystemConfiguration.framework in Frameworks */,
 				727ECD5320C171FB00208436 /* NetworkExtension.framework in Frameworks */,
 				727ECD4F20C171E100208436 /* AudioToolbox.framework in Frameworks */,
@@ -124,6 +137,9 @@
 		726B2D2720BE708A0050FF76 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72BCF43121ADBBED00102205 /* t01.png */,
+				72BCF43021ADBBEC00102205 /* t02.png */,
+				72BCF42F21ADBBEB00102205 /* t03.png */,
 				72B1869F218F109400CD4C5A /* hspectrum2.png */,
 				72B1869D218F101D00CD4C5A /* hspectrum.png */,
 				725E46EA2177013D0012CFE6 /* intermed2.jpg */,
@@ -148,6 +164,7 @@
 		727ECD4520C1705B00208436 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				72BCF43921ADBC3C00102205 /* SpriteKit.framework */,
 				727ECD5A20C1738F00208436 /* Bolts.framework */,
 				727ECD5820C1729D00208436 /* Foundation.framework */,
 				727ECD5620C1727100208436 /* libz.tbd */,
@@ -189,6 +206,8 @@
 				72FA5C7520B323E500B1A4AF /* AppDelegate.m */,
 				72FA5C7720B323E500B1A4AF /* ViewController.h */,
 				72FA5C7820B323E500B1A4AF /* ViewController.m */,
+				727C40E221AF5D5600B9020A /* HDKGenerate.h */,
+				727C40E121AF5D5600B9020A /* HDKGenerate.m */,
 				72FA5C7A20B323E500B1A4AF /* Main.storyboard */,
 				72FA5C7D20B323E500B1A4AF /* Assets.xcassets */,
 				72FA5C7F20B323E500B1A4AF /* LaunchScreen.storyboard */,
@@ -198,6 +217,7 @@
 				726B2D2520BE6E440050FF76 /* LoginViewController.m */,
 				72AB0B7B20C049AF00E852C4 /* UIImageExtras.h */,
 				72AB0B7C20C049AF00E852C4 /* UIImageExtras.m */,
+				72BCF43D21ADBCDA00102205 /* PixLogin-Bridging-Header.h */,
 			);
 			path = PixLogin;
 			sourceTree = "<group>";
@@ -260,6 +280,7 @@
 				TargetAttributes = {
 					72FA5C7020B323E500B1A4AF = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 1010;
 						ProvisioningStyle = Automatic;
 					};
 					72FA5C8820B323E500B1A4AF = {
@@ -298,6 +319,7 @@
 				726B2D3020BE709D0050FF76 /* Okeefe.png in Resources */,
 				726B2D2E20BE709D0050FF76 /* Faithringgold.png in Resources */,
 				726B2D3120BE709D0050FF76 /* Frida.png in Resources */,
+				72BCF43221ADBBEE00102205 /* t03.png in Resources */,
 				72F18E6920BF096F0039CD38 /* 4colorLogo.png in Resources */,
 				72B186A0218F109400CD4C5A /* hspectrum2.png in Resources */,
 				72FA5C8120B323E500B1A4AF /* LaunchScreen.storyboard in Resources */,
@@ -308,7 +330,9 @@
 				72EEABEC21229D0900ED319F /* vangogh120.png in Resources */,
 				726B2D2F20BE709D0050FF76 /* nelson256.png in Resources */,
 				72FA5C7C20B323E500B1A4AF /* Main.storyboard in Resources */,
+				72BCF43321ADBBEE00102205 /* t02.png in Resources */,
 				725E46EB2177013E0012CFE6 /* intermed2.jpg in Resources */,
+				72BCF43421ADBBEE00102205 /* t01.png in Resources */,
 				72B1869E218F101D00CD4C5A /* hspectrum.png in Resources */,
 				72AB0B7A20C043CD00E852C4 /* monet.png in Resources */,
 			);
@@ -331,6 +355,7 @@
 				726B2D2620BE6E440050FF76 /* LoginViewController.m in Sources */,
 				72FA5C7920B323E500B1A4AF /* ViewController.m in Sources */,
 				72AB0B7D20C049AF00E852C4 /* UIImageExtras.m in Sources */,
+				727C40E321AF5D5700B9020A /* HDKGenerate.m in Sources */,
 				72FA5C8420B323E500B1A4AF /* main.m in Sources */,
 				72FA5C7620B323E500B1A4AF /* AppDelegate.m in Sources */,
 			);
@@ -486,6 +511,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HV8UXF4ZBD;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -496,6 +522,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.huedoku.pixlogin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "PixLogin/PixLogin-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -504,6 +533,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = HV8UXF4ZBD;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -514,6 +544,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.huedoku.pixlogin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "PixLogin/PixLogin-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

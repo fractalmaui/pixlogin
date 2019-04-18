@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "UIImageExtras.h"
 #import <Parse/Parse.h>
-
+#import <SpriteKit/SpriteKit.h>
 //REMOVE AT INTEGRATION TIME
 #define PORTRAIT_PERCENT 50
 #define LOGIN_AVATAR_SIZE 128
@@ -24,9 +24,6 @@
     int page;
     int lastPage;
     CGRect pixLabelRect;
-//    CGRect halationLabelRect;
-//    CGRect bcRowFrame;
-    
     int viewWid,viewHit,viewW2,viewH2;
     BOOL animating;
     BOOL returningFromPhotoPicker;
@@ -41,6 +38,9 @@
     UIImage *bkgdTilt;
     
     BOOL signupError;
+    BOOL needPwReset;
+    
+    
 
 }
 @property (weak, nonatomic) IBOutlet UIImageView *obscura;
@@ -69,6 +69,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *pwLabel;
 @property (weak, nonatomic) IBOutlet UIView *activityView;
 @property (weak, nonatomic) IBOutlet UILabel *activityInfoLabel;
+@property (weak, nonatomic) IBOutlet UILabel *emailConfLabel;
+@property (weak, nonatomic) IBOutlet SKView *skView;
 
 
 - (IBAction)resetPasswordSelect:(id)sender;

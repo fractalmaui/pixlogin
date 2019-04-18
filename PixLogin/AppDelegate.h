@@ -8,10 +8,16 @@
 
 #import <UIKit/UIKit.h>
 #import <Parse/Parse.h>
+#import "HDKGenerate.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
+{
+    NSMutableArray *uids;
+    HDKGenerate *hdkgen;
+}
 
 @property (strong, nonatomic) UIWindow *window;
+@property (strong, nonatomic) NSMutableArray *latestPuzzleImages;
 
 
 @end

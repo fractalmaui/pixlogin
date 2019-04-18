@@ -54,6 +54,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *instrsLabel;
 - (IBAction)loginSelect:(id)sender;
 - (IBAction)signupSelect:(id)sender;
+- (IBAction)avatarSelect:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *versionLabel;
 @property (weak, nonatomic) IBOutlet UIButton *loginButton;
 

@@ -35,7 +35,7 @@ NSString * testMode;
     {
         //NSLog(@" Logged in at start:userobjectid %@",PFUser.currentUser.objectId);
         PFUser *user = PFUser.currentUser;
-        NSString *duh = PFUser.currentUser.username;
+        //NSString *duh = PFUser.currentUser.username;
         PFFile *pff = user[@"userPortrait"]; //replace with portraitkey at integrate time
         [pff getDataInBackgroundWithBlock:^(NSData * _Nullable data, NSError * _Nullable error) {
             UIImage *profileImage = [UIImage imageNamed:@"vangogh120"];
@@ -101,7 +101,7 @@ NSString * testMode;
                                                               style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                   //NSLog(@" logout here...");
                                                                   [PFUser logOut];
-                                                                  [self.loginButton setBackgroundImage:[UIImage imageNamed:@"vangogh120"] forState:nil];
+                                                                  [self.loginButton setBackgroundImage:[UIImage imageNamed:@"vangogh120"] forState:UIControlStateNormal];
 
                                                               }];
         UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Change Your Avatar",nil)
@@ -139,4 +139,14 @@ NSString * testMode;
 
 
 
+//==========loginTestVC=========================================================================
+- (IBAction)avatarSelect:(id)sender
+{
+    //Only segue if we are logged in!
+    if ([PFUser currentUser] != nil)
+    {
+        testMode = PL_AVATAR_MODE;
+        [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
+    }
+}
 @end

@@ -55,9 +55,11 @@
 #endif
     }]];
 
-
     
-    
+    _latestPuzzleImages = [[NSMutableArray alloc] init];
+    uids        = [[NSMutableArray alloc] init];
+    hdkgen      = [[HDKGenerate alloc] init];
+    [self loadLatest10Games];
     return YES;
 }
 
@@ -87,6 +89,53 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
+//=====(TESTING)======================================================================
+-(void) loadLatest10Games //: (NSMutableArray *)uidsToLookFor
+{
+    PFQuery *query = [PFQuery queryWithClassName:@"currentGames"];
+    query.limit = 10; //Get latest 10
+    [query orderByDescending:@"updatedAt"];
+    [query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+        if (!error) { //Query came back...
+            [self->uids removeAllObjects];
+            for (PFObject *localObject in objects)  [self->uids addObject:[localObject objectForKey:@"uniquePuzzleID"]];
+            PFQuery *pquery = [PFQuery queryWithClassName:@"plixa"];
+            //NSLog(@" ...found %d uids",(int)self->uids.count);
+            [pquery whereKey:@"uniquePuzzleID" containedIn:self->uids];
+            [pquery findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+                if (!error) {
+                    if (objects.count > 0)
+                    {
+                        int i = 0;
+                        [self->_latestPuzzleImages removeAllObjects];
+                        for (PFObject *localObject in objects)
+                        {
+                            //NSLog(@" obj[%d] uid %@",i,[localObject objectForKey:@"uniquePuzzleID"]);
+                            NSNumber *nn;
+                            nn = [localObject objectForKey:@"puzzleSize"];
+                            int psize = nn.intValue;
+                            NSString *hex1 = [localObject objectForKey:@"color1Hex"];
+                            NSString *hex2 = [localObject objectForKey:@"color2Hex"];
+                            NSString *hex3 = [localObject objectForKey:@"color3Hex"];
+                            NSString *hex4 = [localObject objectForKey:@"color4Hex"];
+                            UIColor *color1 = [self->hdkgen colorFromHexString:hex1];
+                            UIColor *color2 = [self->hdkgen colorFromHexString:hex2];
+                            UIColor *color3 = [self->hdkgen colorFromHexString:hex3];
+                            UIColor *color4 = [self->hdkgen colorFromHexString:hex4];
+                            UIImage *ii = [self->hdkgen makeBitmapFromPuzzle: 128 : psize : 1 :color1 :color2 :color3 :color4];
+                            [self->_latestPuzzleImages addObject:ii];
+                            i++;
+                        } //end pfobj loop
+                        NSLog(@" bing: got latest played puzzle bitmaps");
+                    }
+                }//end inner !error
+            }]; //end inner query
+        } //end outer !error
+    }]; //end outer query
+    
+} //end loadLatest10Games
+
 
 
 @end
