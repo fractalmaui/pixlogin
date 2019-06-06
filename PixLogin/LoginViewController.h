@@ -7,13 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "UIImageExtras.h"
 #import <Parse/Parse.h>
-#import <SpriteKit/SpriteKit.h>
+#import "spinnerView.h"
+#import "UIImageExtras.h"
+
 //REMOVE AT INTEGRATION TIME
 #define PORTRAIT_PERCENT 50
 #define LOGIN_AVATAR_SIZE 128
 
+#define PL_NO_MODE     @"nada"
 #define PL_SIGNUP_MODE @"signup"
 #define PL_LOGIN_MODE  @"login"
 #define PL_AVATAR_MODE @"avatar"
@@ -21,7 +23,7 @@
 @interface LoginViewController : UIViewController
         <UINavigationControllerDelegate,  UIImagePickerControllerDelegate , UITextFieldDelegate>
 {
-    int page;
+    int state,page;
     int lastPage;
     CGRect pixLabelRect;
     int viewWid,viewHit,viewW2,viewH2;
@@ -34,66 +36,72 @@
     UIActivityIndicatorView *ai;
     int failCount;
     
-    UIImage *bkgdTropo;
-    UIImage *bkgdTilt;
+    UIImage *bkgdGradient;
+    
+     spinnerView *spv;
     
     BOOL signupError;
     BOOL needPwReset;
+    BOOL DBBeingAccessed;
     
-    
+    int createAccountStates[8];
+    int loginState;
+    int resetPasswordStates[2];
+    int skipState;
 
 }
 @property (weak, nonatomic) IBOutlet UIImageView *obscura;
-@property (weak, nonatomic) IBOutlet UILabel *welcomeLabel;
+@property (weak, nonatomic) IBOutlet UIView *headerView;
+@property (weak, nonatomic) IBOutlet UILabel *topLabel;
+@property (weak, nonatomic) IBOutlet UILabel *topSmallLabel;
+
+
 @property (weak, nonatomic) IBOutlet UIImageView *portraitImage;
-@property (weak, nonatomic) IBOutlet UIImageView *logoImage;
-@property (weak, nonatomic) IBOutlet UITextField *nameText;
-@property (weak, nonatomic) IBOutlet UITextField *pwText;
-@property (weak, nonatomic) IBOutlet UIButton *uploadButton;
+@property (weak, nonatomic) IBOutlet UILabel *topTextLabel;
+@property (weak, nonatomic) IBOutlet UITextField *topTextField;
+@property (weak, nonatomic) IBOutlet UILabel *bottomTextLabel;
+@property (weak, nonatomic) IBOutlet UITextField *bottomTextField;
+
 @property (weak, nonatomic) IBOutlet UILabel *chooseLabel;
 @property (weak, nonatomic) IBOutlet UIView *faceView;
 @property (weak, nonatomic) IBOutlet UIView *lsButtonView;
+@property (weak, nonatomic) IBOutlet UILabel *orLabel;
+
+
 @property (weak, nonatomic) IBOutlet UIView *userPwView;
-@property (weak, nonatomic) IBOutlet UILabel *emailLabel;
-@property (weak, nonatomic) IBOutlet UITextField *emailText;
-@property (weak, nonatomic) IBOutlet UIButton *resetPasswordButton;
-@property (weak, nonatomic) IBOutlet UIButton *loginButton;
+
+@property (weak, nonatomic) IBOutlet UIView *bottomButtonView;
+@property (weak, nonatomic) IBOutlet UIButton *uploadButton;
+
 @property (weak, nonatomic) IBOutlet UIButton *createButton;
-@property (weak, nonatomic) IBOutlet UIButton *anonymousButton;
-- (IBAction)anonymousSelect:(id)sender;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *background;
-@property (weak, nonatomic) IBOutlet UIButton *rightButton;
-@property (weak, nonatomic) IBOutlet UIButton *leftButton;
-@property (weak, nonatomic) IBOutlet UILabel *nameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *pwLabel;
-@property (weak, nonatomic) IBOutlet UIView *activityView;
-@property (weak, nonatomic) IBOutlet UILabel *activityInfoLabel;
 @property (weak, nonatomic) IBOutlet UILabel *emailConfLabel;
-@property (weak, nonatomic) IBOutlet SKView *skView;
+@property (weak, nonatomic) IBOutlet UIButton *LSTopButton;
+@property (weak, nonatomic) IBOutlet UIButton *LSBottomButton;
+@property (weak, nonatomic) IBOutlet UIButton *anonymousButton;
+@property (weak, nonatomic) IBOutlet UIButton *forgotButton;
 
-
-- (IBAction)resetPasswordSelect:(id)sender;
 
 @property (strong, nonatomic) NSString *userName;
 @property (strong, nonatomic) NSString *password;
 @property (strong, nonatomic) NSString *emailString;
 
 @property (strong, nonatomic) NSString *entryMode;
-
+- (IBAction)LSTopSelect:(id)sender;
+- (IBAction)LSBottomSelect:(id)sender;
+- (IBAction)anonymousSelect:(id)sender;
+- (IBAction)textFieldChanged:(id)sender;
 
 - (IBAction)uploadSelect:(id)sender;
-- (IBAction)facesSelect:(id)sender;
 - (IBAction)face1Select:(id)sender;
 - (IBAction)face2Select:(id)sender;
 - (IBAction)face3Select:(id)sender;
 - (IBAction)face4Select:(id)sender;
 - (IBAction)face5Select:(id)sender;
 - (IBAction)face6Select:(id)sender;
-- (IBAction)loginSelect:(id)sender;
-- (IBAction)signupSelect:(id)sender;
-- (IBAction)leftSelect:(id)sender;
-- (IBAction)rightSelect:(id)sender;
+- (IBAction)backSelect:(id)sender;
+- (IBAction)resetPasswordSelect:(id)sender;
 
 
 @end

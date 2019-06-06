@@ -29,10 +29,13 @@
 		72AB0B7D20C049AF00E852C4 /* UIImageExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = 72AB0B7C20C049AF00E852C4 /* UIImageExtras.m */; };
 		72B1869E218F101D00CD4C5A /* hspectrum.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B1869D218F101D00CD4C5A /* hspectrum.png */; };
 		72B186A0218F109400CD4C5A /* hspectrum2.png in Resources */ = {isa = PBXBuildFile; fileRef = 72B1869F218F109400CD4C5A /* hspectrum2.png */; };
+		72BA190E229C6CFD003C0ACF /* hdkJumbleLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 72BA190D229C6CFC003C0ACF /* hdkJumbleLogo.png */; };
+		72BA1913229F76A9003C0ACF /* spinnerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 72BA1911229F76A9003C0ACF /* spinnerView.m */; };
 		72BCF43221ADBBEE00102205 /* t03.png in Resources */ = {isa = PBXBuildFile; fileRef = 72BCF42F21ADBBEB00102205 /* t03.png */; };
 		72BCF43321ADBBEE00102205 /* t02.png in Resources */ = {isa = PBXBuildFile; fileRef = 72BCF43021ADBBEC00102205 /* t02.png */; };
 		72BCF43421ADBBEE00102205 /* t01.png in Resources */ = {isa = PBXBuildFile; fileRef = 72BCF43121ADBBED00102205 /* t01.png */; };
 		72BCF43A21ADBC3C00102205 /* SpriteKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 72BCF43921ADBC3C00102205 /* SpriteKit.framework */; };
+		72EB7F412277A85C00F6DD71 /* pixlogin_bkgd.png in Resources */ = {isa = PBXBuildFile; fileRef = 72EB7F402277A85B00F6DD71 /* pixlogin_bkgd.png */; };
 		72EEABEC21229D0900ED319F /* vangogh120.png in Resources */ = {isa = PBXBuildFile; fileRef = 72EEABEB21229D0900ED319F /* vangogh120.png */; };
 		72F18E6920BF096F0039CD38 /* 4colorLogo.png in Resources */ = {isa = PBXBuildFile; fileRef = 72F18E6520BF096E0039CD38 /* 4colorLogo.png */; };
 		72F18E6A20BF096F0039CD38 /* br.jpeg in Resources */ = {isa = PBXBuildFile; fileRef = 72F18E6620BF096E0039CD38 /* br.jpeg */; };
@@ -84,11 +87,15 @@
 		72AB0B7C20C049AF00E852C4 /* UIImageExtras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImageExtras.m; sourceTree = "<group>"; };
 		72B1869D218F101D00CD4C5A /* hspectrum.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hspectrum.png; path = Resources/hspectrum.png; sourceTree = SOURCE_ROOT; };
 		72B1869F218F109400CD4C5A /* hspectrum2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hspectrum2.png; path = Resources/hspectrum2.png; sourceTree = SOURCE_ROOT; };
+		72BA190D229C6CFC003C0ACF /* hdkJumbleLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = hdkJumbleLogo.png; path = Resources/hdkJumbleLogo.png; sourceTree = SOURCE_ROOT; };
+		72BA1911229F76A9003C0ACF /* spinnerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = spinnerView.m; sourceTree = "<group>"; };
+		72BA1912229F76A9003C0ACF /* spinnerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spinnerView.h; sourceTree = "<group>"; };
 		72BCF42F21ADBBEB00102205 /* t03.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = t03.png; sourceTree = "<group>"; };
 		72BCF43021ADBBEC00102205 /* t02.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = t02.png; sourceTree = "<group>"; };
 		72BCF43121ADBBED00102205 /* t01.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = t01.png; sourceTree = "<group>"; };
 		72BCF43921ADBC3C00102205 /* SpriteKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SpriteKit.framework; path = System/Library/Frameworks/SpriteKit.framework; sourceTree = SDKROOT; };
 		72BCF43D21ADBCDA00102205 /* PixLogin-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "PixLogin-Bridging-Header.h"; sourceTree = "<group>"; };
+		72EB7F402277A85B00F6DD71 /* pixlogin_bkgd.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pixlogin_bkgd.png; path = Resources/pixlogin_bkgd.png; sourceTree = SOURCE_ROOT; };
 		72EEABEB21229D0900ED319F /* vangogh120.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vangogh120.png; sourceTree = "<group>"; };
 		72F18E6520BF096E0039CD38 /* 4colorLogo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = 4colorLogo.png; path = Resources/4colorLogo.png; sourceTree = SOURCE_ROOT; };
 		72F18E6620BF096E0039CD38 /* br.jpeg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = br.jpeg; path = Resources/br.jpeg; sourceTree = SOURCE_ROOT; };
@@ -137,6 +144,8 @@
 		726B2D2720BE708A0050FF76 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				72BA190D229C6CFC003C0ACF /* hdkJumbleLogo.png */,
+				72EB7F402277A85B00F6DD71 /* pixlogin_bkgd.png */,
 				72BCF43121ADBBED00102205 /* t01.png */,
 				72BCF43021ADBBEC00102205 /* t02.png */,
 				72BCF42F21ADBBEB00102205 /* t03.png */,
@@ -215,6 +224,8 @@
 				72FA5C8320B323E500B1A4AF /* main.m */,
 				726B2D2420BE6E440050FF76 /* LoginViewController.h */,
 				726B2D2520BE6E440050FF76 /* LoginViewController.m */,
+				72BA1912229F76A9003C0ACF /* spinnerView.h */,
+				72BA1911229F76A9003C0ACF /* spinnerView.m */,
 				72AB0B7B20C049AF00E852C4 /* UIImageExtras.h */,
 				72AB0B7C20C049AF00E852C4 /* UIImageExtras.m */,
 				72BCF43D21ADBCDA00102205 /* PixLogin-Bridging-Header.h */,
@@ -321,6 +332,7 @@
 				726B2D3120BE709D0050FF76 /* Frida.png in Resources */,
 				72BCF43221ADBBEE00102205 /* t03.png in Resources */,
 				72F18E6920BF096F0039CD38 /* 4colorLogo.png in Resources */,
+				72BA190E229C6CFD003C0ACF /* hdkJumbleLogo.png in Resources */,
 				72B186A0218F109400CD4C5A /* hspectrum2.png in Resources */,
 				72FA5C8120B323E500B1A4AF /* LaunchScreen.storyboard in Resources */,
 				72F18E6A20BF096F0039CD38 /* br.jpeg in Resources */,
@@ -333,6 +345,7 @@
 				72BCF43321ADBBEE00102205 /* t02.png in Resources */,
 				725E46EB2177013E0012CFE6 /* intermed2.jpg in Resources */,
 				72BCF43421ADBBEE00102205 /* t01.png in Resources */,
+				72EB7F412277A85C00F6DD71 /* pixlogin_bkgd.png in Resources */,
 				72B1869E218F101D00CD4C5A /* hspectrum.png in Resources */,
 				72AB0B7A20C043CD00E852C4 /* monet.png in Resources */,
 			);
@@ -354,6 +367,7 @@
 			files = (
 				726B2D2620BE6E440050FF76 /* LoginViewController.m in Sources */,
 				72FA5C7920B323E500B1A4AF /* ViewController.m in Sources */,
+				72BA1913229F76A9003C0ACF /* spinnerView.m in Sources */,
 				72AB0B7D20C049AF00E852C4 /* UIImageExtras.m in Sources */,
 				727C40E321AF5D5700B9020A /* HDKGenerate.m in Sources */,
 				72FA5C8420B323E500B1A4AF /* main.m in Sources */,

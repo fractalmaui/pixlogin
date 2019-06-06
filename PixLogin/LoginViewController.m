@@ -5,20 +5,19 @@
 //  Created by Dave Scruton on 5/29/18.
 //  Copyright © 2018 huedoku. All rights reserved.
 //
-//  Parse URL http://ec2-52-42-95-208.us-west-2.compute.amazonaws.com
-//   NOTE: Changes EVERY TIME you restart!
-//    davesky/dogdog12!
-//  Reset Email Failure, (fix?)
-//  An appName, publicServerURL, and emailAdapter are required
-//   for password reset and email verification functionality...
-//  https://stackoverflow.com/questions/36764372/enabling-reset-password-and-email-verification-for-parse-server-hosted-locally
-//  More examples of email confirmation?
-//    https://medium.com/swift-programming/ios-swift-parse-com-how-to-implement-email-verification-of-users-88248ab7343f
 //  Sashido email templates:
 //   https://blog.sashido.io/emails-and-custom-user-facing-pages/
+//  Figma design link:
+//  https://www.figma.com/file/OzHOCvGVRUruUDXUduFleDZT/Pix2019?node-id=0%3A1
 //  Look for emailVerified column in PFUser table to tell if email verification went thru
+//  4/29 new  bkgd
+//  5/24 overhaul, new state transitions
+//  5/27 now only 2 text fields, top/bottom
+//  6/2  Ignore user events? What about timeouts or hangs? user is stuck!
 #import "LoginViewController.h"
 
+
+#define DONOT_IGNOREUSEREVENTS
 @implementation LoginViewController
 
 //Remove at integration time (use plixaKeys)
@@ -33,10 +32,22 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
         animSpeed   = 0.5;
         avatarNum   = 0; //Unselected...
         avatarImage = nil;
-        bkgdTropo   = [UIImage imageNamed:@"intermed2.jpg"];
-        bkgdTilt    = [UIImage imageNamed:@"tiltbkgd"];
+//        bkgdTropo   = [UIImage imageNamed:@"intermed2.jpg"];
+        bkgdGradient   = [UIImage imageNamed:@"pixlogin_bkgd"];
         needPwReset = false;
         returningFromPhotoPicker = false;
+
+        state = 1; //Initial state...
+        //These are the pages we will switch between while creating an account
+        //NOTE: state 0 DOES NOT EXIST, states are from 1 to 11!
+        for (int i=0;i<=7;i++) createAccountStates[i] = i;
+        //Login state
+        loginState = 5;
+        //States for resetting the password
+        for (int i=9;i<=10;i++) resetPasswordStates[i] = i;
+        //Skip account setup
+        skipState = 11;
+        DBBeingAccessed = FALSE;
     }
     return self;
     
@@ -48,17 +59,10 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    ai = [[UIActivityIndicatorView alloc] initWithFrame:CGRectMake(0, 0, 180, 180)];
-    ai.hidesWhenStopped = true;
-    ai.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhiteLarge;
-    [_activityView addSubview:ai];
-    _activityView.layer.borderWidth = 2;
-    _activityView.layer.borderColor = [UIColor whiteColor].CGColor;
-    _activityView.hidden = TRUE;
 
-    _nameText.delegate  = self;
-    _pwText.delegate    = self;
-    _emailText.delegate = self;
+    //5/27
+    _topTextField.delegate    = self;
+    _bottomTextField.delegate = self;
     
  
 }
@@ -74,6 +78,10 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     viewH2  = viewHit/2;
     _portraitImage.clipsToBounds = TRUE;
     _portraitImage.layer.cornerRadius = _portraitImage.frame.size.width * 0.01 * PORTRAIT_PERCENT;
+
+    //Spinning activity view
+    spv = [[spinnerView alloc] initWithFrame:CGRectMake(0, 0, viewWid, viewHit)];
+    [self.view addSubview:spv];
 
 }
 
@@ -91,24 +99,16 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     [super viewDidAppear:animated];
     if (!returningFromPhotoPicker) //Entering this UI first time?
     {
-        if ([_entryMode containsString : PL_SIGNUP_MODE])
-        {
-            page = 0;
-            [self firstPage];
-        }
-        else if ([_entryMode containsString : PL_AVATAR_MODE])  //Change user avatar?
-        {
-            page = 2;
-            [self thirdPage];
-        }
-        else if ([_entryMode containsString : PL_LOGIN_MODE])  //Login for returning user?
-        {
-            page = 4;
-            [self fifthPage];
-        }
-
+        state = 1; //Initial state...
+        [self getPageForState];
+        [self gotoNthPage];
     }
-    else [self thirdPage]; //Returning from photo picker!
+    else     //Returning from photo picker!
+    {
+        state = 4;
+        [self getPageForState];
+        [self gotoNthPage];
+    }
     returningFromPhotoPicker = false;
 }
 
@@ -132,103 +132,63 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 //----LoginViewController---------------------------------
 -(void) setControlAlphasToZero
 {
-    _welcomeLabel.alpha  = 0;
     _portraitImage.alpha = 0;
-    _logoImage.alpha     = 0;
     _lsButtonView.alpha  = 0;
     _userPwView.alpha    = 0;
     _faceView.alpha      = 0;
-    _leftButton.alpha    = 0;
-    _rightButton.alpha   = 0;
-    _uploadButton.alpha  = 0;
     _chooseLabel.alpha   = 0;
-    _resetPasswordButton.hidden = true; //Special control...
-    
+    _bottomButtonView.hidden = TRUE; //Does this get alphad in?
+    _topLabel.hidden = TRUE;
+    _bottomLabel.hidden = TRUE;
+    _uploadButton.hidden = TRUE;
+    _emailConfLabel.hidden = TRUE;
 }  //end setControlAlphasToZero
 
-
 //----LoginViewController---------------------------------
--(void) gotoPreviousPage
+-(void)gotoPageForState : (int)s
 {
-    if (page == 0)
-        [self dismissViewControllerAnimated:true completion:nil];
-    else
-    {
-        page--;
-        [self obscureOutToNextPage];
-    }
-}  //end gotoPreviousPage
-
-//----LoginViewController---------------------------------
--(void) gotoNextPage
-{
-    //NSLog(@" nextpage %d vs %d",page,lastPage);
-    //Do we need to perform login / signup ???
-    if (page == 1) //Page 1 just has login/signup buttons now
-    {
-        if (![self getNameAndEmailFields]) return;
-    }
-    else if (page == 3) //Time to signup?  NO PAGE INCREMENT
-    {
-        if (![self getPasswordField]) return;
-        [self signupUser];  // dismisses ui if ok
-        return;
-    }
-    else if (page == 4 && !needPwReset) //Login page?  NO PAGE INCREMENT
-    {
-        if (![self getNameAndPasswordFields]) return;
-        [self loginUser];  // dismisses ui if ok
-        return;
-    }
-    else if (page == 5) //Perform PW reset? NO PAGE INCREMENT
-    {
-        [self performPasswordReset];  // dismisses ui if ok
-        return;
-    }
-    page++;
-    [self obscureOutToNextPage];
-    
-} //end gotoNextPage
-
-
-//----LoginViewController---------------------------------
--(void) obscureOutToNextPage
-{
-    //...continuing, animate into next page now
-    float duration = animSpeed;
-    [UIView animateWithDuration:duration
-                          delay:0
-                        options:UIViewAnimationOptionCurveEaseInOut
-                     animations:^{
-                         self.obscura.alpha = 1;
-                         self.rightButton.alpha = 0;
-                     }
-                     completion:^(BOOL finished){
-                         [self gotoNextPagePartTwo];
-                     }
-     ];
-
+    state = s;
+    [self getPageForState];
+    [self gotoNthPage];
 }
 
 //----LoginViewController---------------------------------
--(void) gotoNextPagePartTwo
+-(void) getPageForState
 {
-    [self setControlAlphasToZero];
+    if ([_entryMode containsString : PL_SIGNUP_MODE])
+    {
+        page = createAccountStates[state];
+    }
+    else if ([_entryMode containsString : PL_AVATAR_MODE])  //Change user avatar?
+    {
+        _userName = PFUser.currentUser.username; //Make sure username is set up!
+        page = 4; //???? Need to fit this into our new state system
+    }
+    else if ([_entryMode containsString : PL_LOGIN_MODE])  //Login for returning user?
+    {
+        page = loginState;
+    }
+
+}
+
+
+
+//----LoginViewController---------------------------------
+-(void) gotoNthPage
+{
     switch(page)
     {
-        case 0: //This only gets hit on a "back"...
-            [self animateInOut:_obscura       : 0 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-            [self firstPage];
-            break;
-        case 1: [self secondPage];break;
-        case 2: [self thirdPage];break;
-        case 3: [self fourthPage];break;
-        case 4: [self fifthPage];break;
-        case 5: [self sixthPage];break;
-        //default:
-           // [self dismissViewControllerAnimated : YES completion:nil];break;
+        case 1: [self firstPage];   break;
+        case 2: [self secondPage];  break;
+        case 3: [self thirdPage];   break;
+        case 4: [self fourthPage];  break;
+        case 5: [self fifthPage];   break;
+        case 6: [self sixthPage];   break;
+        case 7: [self seventhPage]; break;
+        //etc...
     }
-} //end gotoNextPagePartTwo
+} //end gotoNthPage
+
 
 //----LoginViewController---------------------------------
 // Direction 0 = animate out, 1 = animate in...
@@ -284,29 +244,43 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 } //end loadCurrentUserInfo
 
 //----LoginViewController---------------------------------
--(void) updateCurrentUserInfo
+-(void) updateUserAvatar
 {
     PFUser *user = PFUser.currentUser;
     NSData *avatarData = UIImagePNGRepresentation(avatarImage);
     PFFile *avatarImageFile = [PFFile fileWithName : @"avatarImage.png" data:avatarData];
     user[_PuserPortraitKey] = avatarImageFile;
-    _activityInfoLabel.text = @"Updating your profile";
-    _activityView.hidden = FALSE;
+    [spv start : @"Updating your profile"];
     [ai startAnimating];
+    DBBeingAccessed = FALSE;
+
+#ifdef IGNOREUSEREVENTS
+    [UIApplication.sharedApplication beginIgnoringInteractionEvents];
+#endif
     [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        [self->spv stop];
+        self->DBBeingAccessed = FALSE;
         if (succeeded)
         {
-            self->_activityView.hidden = TRUE;
-            [self->ai stopAnimating];
-            [self dismissViewControllerAnimated : YES completion:nil];
+            //This has 2 modes: user signup or updating avatar!
+            if ([self->_entryMode containsString : PL_AVATAR_MODE])  //Reset avatar? Dismiss UI
+                [self dismissViewControllerAnimated : YES completion:nil];
+            else { //Creating account?
+                [PFUser logOut]; //Log us out!
+                [self gotoPageForState:self->state+1];  //udderwise goto next state...
+            }
         }
         else
         {
             [self pixAlertDEBUG:self :@"Could not save Avatar" : error.localizedDescription :false];
         }
+#ifdef IGNOREUSEREVENTS
+        [UIApplication.sharedApplication endIgnoringInteractionEvents];
+#endif
+
     }];
     
-} //end updateCurrentUserInfo
+} //end updateUserAvatar
 
 
 
@@ -314,306 +288,436 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 // Opener...
 -(void) firstPage
 {
-    //NSLog(@" page 1");
-    animating = TRUE;
-    _leftButton.hidden  = TRUE;
-    _rightButton.hidden = TRUE;
-    _emailConfLabel.hidden = TRUE;
-    failCount = 0;
-    //First page: Clear out text fields ALWAYS
-    _nameText.text       = @"";
-    _pwText.text         = @"";
-    _emailText.text      = @"";
-    _background.image    = bkgdTropo;
-    _bottomLabel.text    = @"";
-    _emailConfLabel.text = @"";
-
-    //Interesting test?
-   _welcomeLabel.textColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"hspectrum2"]];
     
-    BOOL login_hidden = TRUE;
-    if ([_entryMode containsString : PL_SIGNUP_MODE]) //This should be the ONLY entry mode!
-    {
-        _welcomeLabel.text = @"Add your\nColor Profile";
-        _bottomLabel.text = @"to create\nbrilliant puzzles";
-    }
-    _createButton.hidden    = !login_hidden;
-    _anonymousButton.hidden = !login_hidden;
+    //First, hide fields we don't need...
+    _portraitImage.hidden   = TRUE;
+    _userPwView.hidden      = TRUE;
+    _faceView.hidden        = TRUE;
+    _uploadButton.hidden    = TRUE;
+    _bottomLabel.hidden     = TRUE;
+    _emailConfLabel.hidden  = TRUE; //DO I need this?
+    _forgotButton.hidden    = TRUE;
 
+    //Now show fields we DO need...
+    _topLabel.hidden         = FALSE;
+    _topSmallLabel.hidden    = FALSE;
+    _lsButtonView.hidden     = FALSE;
+    _bottomButtonView.hidden = FALSE;
+    _anonymousButton.hidden  = FALSE;
+    _orLabel.hidden          = FALSE;
+    _LSBottomButton.hidden   = FALSE;
+    
+    //Clear all user login fields...
+    avatarImage = [UIImage imageNamed:@"emptyUser"];
+    _userName    = @"";
+    _password    = @"";
+    _emailString = @"";
+
+    //Set text fields...
+    _topLabel.text = @"Hue Know This\n ";
+    _topSmallLabel.text = @"Get in here, login or create\nan account if you are new";
+
+    animating = TRUE;
     //These only get animated in ONCE...
-    [self animateInOut:_logoImage     : 1 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_welcomeLabel  : 1 : 0.3 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_bottomLabel   : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_lsButtonView  : 1 : 1.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+    [self animateInOut:_topLabel          : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_topSmallLabel     : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_lsButtonView      : 1 : 1.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_bottomButtonView  : 1 : 1.2 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
 
 } //end firstPage
 
 //----LoginViewController---------------------------------
-// Create Profile: Gets username / email...
+// Create Profile: Gets username
 -(void) secondPage
 {
-    //NSLog(@" page 2");
-    _logoImage.hidden      = TRUE;
-    _pwText.hidden         = TRUE;
-    _pwLabel.hidden        = TRUE;
-    _resetPasswordButton.hidden = TRUE;
-    _userPwView.hidden     = FALSE;
-    _nameLabel.hidden      = FALSE;
-    _emailLabel.hidden     = FALSE;
-    _leftButton.hidden     = FALSE;
-    _rightButton.hidden    = FALSE;
-    _background.image      = bkgdTilt;
-    _bottomLabel.hidden    = FALSE;
+    //First, hide fields we don't need...
+    _portraitImage.hidden    = TRUE;
+    _faceView.hidden         = TRUE;
+    _uploadButton.hidden     = TRUE;
+    _bottomLabel.hidden      = TRUE;
+    _orLabel.hidden          = TRUE;
+    _LSBottomButton.hidden   = TRUE;
+    _emailConfLabel.hidden   = TRUE; //DO I need this?
+    _topTextLabel.hidden     = TRUE;
+    _bottomTextLabel.hidden  = TRUE;
+    _bottomTextField.hidden  = TRUE;
+    _bottomButtonView.hidden = TRUE;
+
+    //Now show fields we DO need...
+    _topLabel.hidden         = FALSE;
+    _topSmallLabel.hidden    = FALSE;
+    _lsButtonView.hidden     = FALSE;
+    _topTextField.hidden     = FALSE;
+    _userPwView.hidden       = FALSE;
     
-    //Test coloring label...
-    _welcomeLabel.textColor = [UIColor whiteColor];
-    [_leftButton setTitle:@"cancel" forState:UIControlStateNormal];
-
-    _welcomeLabel.text = @"Create your profile\n"; // linebreak keeps label at top VP
-    _bottomLabel.text  = @"Choose a username and add your email address";
-
-    [_rightButton setTitle:@"next" forState:UIControlStateNormal];
-    //This animates obscura OUT...
-    [self animateInOut:_obscura       : 0 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    //These get animated IN...
-    [self animateInOut:_logoImage     : 1 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_welcomeLabel  : 1 : 0.3 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_userPwView    : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_bottomLabel   : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_leftButton    : 1 : 0.9 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_rightButton   : 1 : 0.9 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+    //Set text fields...
+    _topLabel.text      = @"create account\n ";
+    _topSmallLabel.text = @"choose your username";
+    _topTextField.text  = @"";
+    _topTextField.placeholder = @"enter username";
+    [_LSTopButton setTitle:@"Next" forState:UIControlStateNormal];
+    [_LSTopButton setEnabled:FALSE];
+    
+    animating = TRUE;
+    //These only get animated in ONCE...
+    [self animateInOut:_topLabel          : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_topSmallLabel     : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_lsButtonView      : 1 : 1.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_userPwView        : 1 : 1.2 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_bottomButtonView  : 1 : 1.4 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
 
 } //end secondPage
 
 
 //----LoginViewController---------------------------------
-// Avatar Time...
+// Get email and password strings...
 -(void) thirdPage
 {
-    _bottomLabel.hidden  = TRUE;
-    _uploadButton.hidden = FALSE;
-    _chooseLabel.hidden  = FALSE;
-    _faceView.hidden     = FALSE;
-    _emailConfLabel.hidden = TRUE;
-    _resetPasswordButton.hidden = TRUE;
-
-    if ([_entryMode containsString : PL_AVATAR_MODE])
-    {
-        if (!returningFromPhotoPicker) [self loadCurrentUserInfo];
-        [_leftButton setTitle:@"cancel" forState:UIControlStateNormal];
-        [_rightButton setTitle:@"save" forState:UIControlStateNormal];
-    }
-    else
-    {
-        [_leftButton setTitle:@"back" forState:UIControlStateNormal];
-        [_rightButton setTitle:@"next" forState:UIControlStateNormal];
-    }
+    //First, hide fields we don't need...
+    _portraitImage.hidden   = TRUE;
+    _faceView.hidden        = TRUE;
+    _uploadButton.hidden    = TRUE;
+    _bottomLabel.hidden     = TRUE;
+    _orLabel.hidden         = TRUE;
+    _LSBottomButton.hidden  = TRUE;
+    _emailConfLabel.hidden  = TRUE; //DO I need this?
+    _topTextLabel.hidden    = TRUE;
+    _bottomTextLabel.hidden = TRUE;
+    _bottomButtonView.hidden= TRUE;
+    
+    //Now show fields we DO need...
+    _topLabel.hidden         = FALSE;
+    _topSmallLabel.hidden    = FALSE;
+    _lsButtonView.hidden     = FALSE;
+    _userPwView.hidden       = FALSE;
+    _topTextField.hidden     = FALSE;
+    _bottomTextField.hidden  = FALSE;
+    //Set text fields...
+    _topLabel.text = _userName;
+    _topSmallLabel.text = @"password must be\n8 characters or more";
+    _topTextField.text = @"";
+    _topTextField.placeholder    = @"enter email";
+    _bottomTextField.text = @"";
+    _bottomTextField.placeholder = @"choose a password";
+    [_LSTopButton setTitle:@"Next" forState:UIControlStateNormal];
     
     animating = TRUE;
-    _welcomeLabel.text = [NSString stringWithFormat:@"%@\n",_userName]; // add linefeed to keep label at top of its VP
-
-    //This animates obscura OUT...
-    [self animateInOut:_obscura       : 0 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    //These get animated IN...
-    [self animateInOut:_portraitImage : 1 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_welcomeLabel  : 1 : 0.3 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_chooseLabel   : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_uploadButton  : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_faceView      : 1 : 0.9 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
-    
-    
-    [self animateInOut:_leftButton     : 1 : 1.2 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_rightButton    : 1 : 1.2 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
-
+    //These only get animated in ONCE...
+    [self animateInOut:_topLabel          : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_topSmallLabel     : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_lsButtonView      : 1 : 1.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_userPwView        : 1 : 1.2 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_bottomButtonView  : 1 : 1.4 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
 } //end thirdPage
 
 
 //----LoginViewController---------------------------------
-// Password Time... last page before creating account
+// Avatar Time...
 -(void) fourthPage
 {
-    //Hide stuff from last page
-    _faceView.hidden     = TRUE;
-    _uploadButton.hidden = TRUE;
-    _chooseLabel.hidden  = TRUE;
+    //First, hide fields we don't need...
+    _topSmallLabel.hidden    = TRUE;
+    _userPwView.hidden       = TRUE;
+    _emailConfLabel.hidden   = TRUE;
+    _bottomButtonView.hidden = TRUE;
+    _topTextField.hidden     = TRUE;
+    _bottomLabel.hidden      = TRUE;
+    _LSTopButton.hidden      = TRUE; //Hidden initially, shown later
+    _LSBottomButton.hidden   = TRUE;
+    _orLabel.hidden          = TRUE;
 
-    //Show pw view, email confirmation label and bottom label...
-    _userPwView.hidden   = FALSE;
-    _bottomLabel.hidden  = FALSE;
-    _emailConfLabel.hidden = FALSE;
+    //Now show fields we DO need...
+    _topLabel.hidden         = FALSE;
+    _portraitImage.hidden    = FALSE;
+    _chooseLabel.hidden      = FALSE;
+    _faceView.hidden         = FALSE;
+    _uploadButton.hidden     = FALSE;
+    _lsButtonView.hidden     = FALSE;
 
-    //Just show password fields
-    _nameLabel.hidden     = TRUE;
-    _nameText.hidden      = TRUE;
-    _emailLabel.hidden    = TRUE;
-    _emailText.hidden     = TRUE;
-    _pwLabel.hidden       = FALSE;
-    _pwText.hidden        = FALSE;
+    NSString* nameWithCR = [NSString stringWithFormat:@"%@\n",_userName]; //Add CR for formatting
+    _topLabel.text = nameWithCR;
+    [_LSTopButton setTitle:@"Next" forState:UIControlStateNormal];
 
-   _welcomeLabel.text = [NSString stringWithFormat:@"%@\n",_userName];
-    _emailConfLabel.text = _emailString;
+    if ([_entryMode containsString : PL_AVATAR_MODE])
+    {
+        if (!returningFromPhotoPicker) [self loadCurrentUserInfo];
+    }
+    else //Do I need to do something in signup mode?
+    {
+    }
     
     animating = TRUE;
-    _bottomLabel.text = @"Make sure your password is at least eight characters";
-    [_rightButton setTitle:@"signup" forState:UIControlStateNormal];
+
     //This animates obscura OUT...
     [self animateInOut:_obscura       : 0 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
     //These get animated IN...
     [self animateInOut:_portraitImage : 1 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_welcomeLabel  : 1 : 0.3 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_userPwView    : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_bottomLabel   : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_leftButton    : 1 : 0.9 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_rightButton   : 1 : 0.9 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+    [self animateInOut:_chooseLabel   : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_lsButtonView  : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_faceView      : 1 : 0.9 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+    
 
 } //end fourthPage
+
+
 
 //----LoginViewController---------------------------------
 // Login Entry point...
 -(void) fifthPage
 {
-    //Show Username / password fields
-    _nameLabel.hidden      = FALSE;
-    _nameText.hidden       = FALSE;
-    _emailLabel.hidden     = TRUE;
-    _emailText.hidden      = TRUE;
-    _pwLabel.hidden        = FALSE;
-    _pwText.hidden         = FALSE;
-    _emailConfLabel.hidden = TRUE;
-    _rightButton.hidden    = FALSE; //May have been hidden by pw reset
-    _resetPasswordButton.hidden = FALSE;
-   //TEST _nameText.text    = @"davesky";
-   //TEST _pwText.text      = @"asdfasdf";
+    //First, hide fields we don't need...
+    _portraitImage.hidden   = TRUE;
+    _faceView.hidden        = TRUE;
+    _uploadButton.hidden    = TRUE;
+    _bottomLabel.hidden     = TRUE;
+    _orLabel.hidden         = TRUE;
+    _LSBottomButton.hidden  = TRUE;
+    _emailConfLabel.hidden  = TRUE; //DO I need this?
+    _topTextLabel.hidden    = TRUE;
+    _bottomTextLabel.hidden = TRUE;
+    _anonymousButton.hidden = TRUE;
+    
+    //Now show fields we DO need...
+    _topLabel.hidden         = FALSE;
+    _topSmallLabel.hidden    = FALSE;
+    _lsButtonView.hidden     = FALSE;
+    _forgotButton.hidden     = FALSE;
+    _userPwView.hidden       = FALSE;
+    _topTextField.hidden     = FALSE;
+    _bottomTextField.hidden  = FALSE;
+    _bottomButtonView.hidden = FALSE;
+    
+    //Set text fields...
+    _topLabel.text = @"color is relative";
+    _topSmallLabel.text = @"get in here\n\n";
+    _topTextField.text = @"";
+    _topTextField.placeholder    = @"username";
+    _bottomTextField.text = @"";
+    _bottomTextField.placeholder = @"password";
+    [_LSTopButton setTitle:@"Login" forState:UIControlStateNormal];
     
     animating = TRUE;
-    _welcomeLabel.text = @"Login to Pix";
-    _bottomLabel.text = @"";
-    [_rightButton setTitle:@"login" forState:UIControlStateNormal];
-    //This animates obscura OUT...
-    [self animateInOut:_obscura       : 0 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    //These get animated IN...
-    [self animateInOut:_welcomeLabel  : 1 : 0.3 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_userPwView    : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_leftButton    : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_rightButton   : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+    //These only get animated in ONCE...
+    [self animateInOut:_topLabel          : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_topSmallLabel     : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_lsButtonView      : 1 : 1.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_userPwView        : 1 : 1.2 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_bottomButtonView  : 1 : 1.4 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+    if ([_entryMode containsString : PL_SIGNUP_MODE]) //Signup? user needs to verify first
+        [self emailVerifyAlert]; //We need an alert over this page!
 
 } //end fifthPage
 
 //----LoginViewController---------------------------------
-// Password Reset...  asdf
+// Password Reset...
 -(void) sixthPage
 {
-    //Show Username / password fields
-    _nameLabel.hidden      = TRUE;
-    _nameText.hidden       = TRUE;
-    _emailLabel.hidden     = FALSE;
-    _emailText.hidden      = FALSE;
-    _pwLabel.hidden        = TRUE;
-    _pwText.hidden         = TRUE;
-    _emailConfLabel.hidden = TRUE;
-    _resetPasswordButton.hidden = TRUE;
-    _leftButton.hidden     = FALSE;
-    _rightButton.hidden    = FALSE;
-
+    //First, hide fields we don't need...
+    _portraitImage.hidden    = TRUE;
+    _faceView.hidden         = TRUE;
+    _uploadButton.hidden     = TRUE;
+    _bottomLabel.hidden      = TRUE;
+    _orLabel.hidden          = TRUE;
+    _LSBottomButton.hidden   = TRUE;
+    _emailConfLabel.hidden   = TRUE;
+    _topTextLabel.hidden     = TRUE;
+    _bottomTextLabel.hidden  = TRUE;
+    _bottomTextField.hidden  = TRUE;
+    _bottomButtonView.hidden = TRUE;
+    
+    //Now show fields we DO need...
+    _topLabel.hidden         = FALSE;
+    _topSmallLabel.hidden    = FALSE;
+    _lsButtonView.hidden     = FALSE;
+    _topTextField.hidden     = FALSE;
+    _userPwView.hidden       = FALSE;
+    
+    //Set text fields...
+    _topLabel.text      = @"what\'s\nyour email? ";
+    _topSmallLabel.text = @"Login not working? No Worries!\n";
+    _topTextField.text  = @"";
+    _topTextField.placeholder = @"enter email";
+    [_LSTopButton setTitle:@"reset password" forState:UIControlStateNormal];
+    [_LSTopButton setEnabled:FALSE];
+    
     animating = TRUE;
-    [_leftButton setTitle:@"back"   forState:UIControlStateNormal];
-    [_rightButton setTitle:@"reset" forState:UIControlStateNormal];
-    self->_welcomeLabel.text  = @"";
-    self->_bottomLabel.text   = @"Enter your Email address.\nWe will send you a password reset.";
-    //This animates obscura OUT...
-    [self animateInOut:_obscura       : 0 : 0.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    //These get animated IN...
-    [self animateInOut:_welcomeLabel  : 1 : 0.3 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_userPwView    : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_leftButton    : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
-    [self animateInOut:_rightButton   : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+    //These only get animated in ONCE...
+    [self animateInOut:_topLabel          : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_topSmallLabel     : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_lsButtonView      : 1 : 1.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_userPwView        : 1 : 1.2 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_bottomButtonView  : 1 : 1.4 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
 
 } //end sixthPage
 
-
-
 //----LoginViewController---------------------------------
--(BOOL) getNameAndEmailFields
+// Skip page...
+-(void) seventhPage
 {
-    [_nameText  resignFirstResponder]; //Make sure any keyboards are gone...
-    [_emailText resignFirstResponder];
-    _userName = _nameText.text;
-    _emailString = _emailText.text.lowercaseString;
-    if ([_userName isEqualToString:@""]    ||
-        [_emailString isEqualToString:@""] )
-    {
-        [self pixAlertDEBUG:self :@"Empty Field(s)" :@"Please enter a Username and Email" :false];
-        return false;
-    }
-    if (![self validateEmailWithString : _emailString])
-    {
-        [self pixAlertDEBUG:self :@"Email Address looks wrong" :@"Your email must contain letters or numbers, a dot and the @ character" :false];
-        return false;
-    }
-    //Check validity...
-    return true;
+    //First, hide fields we don't need...
+    _portraitImage.hidden    = TRUE;
+    _faceView.hidden         = TRUE;
+    _userPwView.hidden       = TRUE;
+    _uploadButton.hidden     = TRUE;
+    _orLabel.hidden          = TRUE;
+    _LSBottomButton.hidden   = TRUE;
+    _emailConfLabel.hidden   = TRUE; //DO I need this?
+    _topTextLabel.hidden     = TRUE;
+    _bottomTextLabel.hidden  = TRUE;
+    _bottomTextField.hidden  = TRUE;
+    _bottomButtonView.hidden = TRUE;
     
-} //end getNameAndEmailFields
+    //Now show fields we DO need...
+    _topLabel.hidden         = FALSE;
+    _topSmallLabel.hidden    = FALSE;
+    _lsButtonView.hidden     = FALSE;
+    _bottomLabel.hidden      = FALSE;
 
-
-
-//----LoginViewController---------------------------------
--(BOOL) getNameAndPasswordFields
-{
-    [_nameText resignFirstResponder];  //Make sure kb gone...
-    [_pwText   resignFirstResponder];
-    _userName   = _nameText.text;
-    _password   = _pwText.text;
-    //Check validity...
-    if ([_userName isEqualToString:@""]    ||
-        [_password    isEqualToString:@""] )
-    {
-        [self pixAlertDEBUG:self :@"Empty Field(s)" :@"Please enter your Username and Password" :false];
-        return false;
-    }
-    return true;
+    //Set text fields...
+    _topLabel.text      = @"Oh nohue\ndi\'nt";
+    _topSmallLabel.text = @"As HueGogh you can play,\n but can\'t create,share,\n or get a power color.";
+    _bottomLabel.text = @"You can always create an account later";
+    [_LSTopButton setTitle:@"play anyway" forState:UIControlStateNormal];
     
-} //end getEmailAndPasswordFields
+    animating = TRUE;
+    //These only get animated in ONCE...
+    [self animateInOut:_topLabel          : 1 : 0.5 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_topSmallLabel     : 1 : 0.7 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_lsButtonView      : 1 : 1.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_userPwView        : 1 : 1.2 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_bottomLabel       : 1 : 1.4 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: FALSE];
+    [self animateInOut:_bottomButtonView  : 1 : 1.6 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+
+} //end seventhPage
 
 
 //----LoginViewController---------------------------------
--(BOOL) getPasswordField
+//  Get email / password fields, validates both, then does signup
+-(void) checkEmailAndPasswordforSignup
 {
-    [_pwText    resignFirstResponder]; //Make sure kb gone
-    _password = _pwText.text;
-    if ([_password isEqualToString:@""])
+    NSString *topString = _topTextField.text;
+    NSString *botString = _bottomTextField.text;
+    if (botString.length < 8)
     {
-        [self pixAlertDEBUG:self :@"Empty Field(s)" :@"Please enter a Password" :false];
-        return false;
+        [self pixAlertDEBUG:self :@"Password too short" : @"Your password must be at least 8 characters" :false];
     }
-    if (_password.length < 8)
+    else{ //PW OK? keep checking
+        if ([self validateEmailWithString:topString]) //Legit?
+        {
+                _emailString = topString;
+                _password    = botString; //Load up final fields
+                [self signupUser]; //This accesses DB... continues after success
+        }
+        else{
+            [self pixAlertDEBUG:self :@"Bad Email Address" : @"It looks like you have bad characters in your email address" :false];
+        }
+    }
+} //end checkEmailAndPasswordforSignup
+
+//----LoginViewController---------------------------------
+//  Get email field,
+-(void) checkEmailforPasswordReset
+{
+    NSString *topString = _topTextField.text;
+    if ([self validateEmailWithString:topString]) //Legit?
     {
-        [self pixAlertDEBUG:self :@"Password too short" :@"Please create a password with at least 8 characters" :false];
-        return false;
+        _emailString = topString; //Load up final fields
+        [self performPasswordReset]; //This accesses DB... continues after success
     }
-    //Check validity...
-    return true;
-    
-} //end getPasswordField
+    else{
+        [self pixAlertDEBUG:self :@"Bad Email Address" : @"It looks like you have bad characters in your email address" :false];
+    }
+} //end checkEmailforPasswordReset
 
 
 //----LoginViewController---------------------------------
-- (IBAction)uploadSelect:(id)sender
+//  Get email / password fields, validates both, then does signup
+-(void) getUsernameAndPasswordAndLogin
 {
-    NSLog(@" UploadSelect");
-    [self displayPhotoPicker];
+    _userName = _topTextField.text;
+    _password = _bottomTextField.text;
+    [self loginUser];
+} //end getUsernameAndPasswordAndLogin
+
+//----LoginViewController---------------------------------
+//  Get username field, check for obvious errors / punc,
+//   then see if it already is in use
+-(void) checkUsername
+{
+    NSString *testName = _topTextField.text;
+    if ([self validateUsernameWithString:testName]) //Legit?
+    {
+        [spv start : @"Check availability"];
+        DBBeingAccessed = TRUE;
+
+#ifdef IGNOREUSEREVENTS
+        [UIApplication.sharedApplication beginIgnoringInteractionEvents];
+#endif
+        PFQuery *query= [PFUser query];
+        [query whereKey:@"username" equalTo:testName];
+        [query getFirstObjectInBackgroundWithBlock:^(PFObject *object, NSError *error){
+            if (object == nil) //Username available? goto next state...
+            {
+                self->_userName = testName; //Set username now
+                [self gotoPageForState:self->state+1];
+            }
+            else
+                [self pixAlertDEBUG:self :@"Username Already Taken" : @"Please try a different username" :false];
+#ifdef IGNOREUSEREVENTS
+            [UIApplication.sharedApplication endIgnoringInteractionEvents];
+#endif
+            [self->spv stop];
+            self->DBBeingAccessed = FALSE;
+
+        }];
+    }
+    else
+        [self pixAlertDEBUG:self :@"Bad Characters" : @"Username must be composed of letters and/or numbers" :false];
+} //end checkUsername
+
+//----LoginViewController---------------------------------
+// This button has multiple uses, sometimes its Next,
+//  sometimes its Login
+- (IBAction)LSTopSelect:(id)sender
+{
+    //NSLog(@" LSTopSelect state %d",state);
+    if (DBBeingAccessed) return; //DO not advance while DB in progress!
+    //Handle signup sequence...
+    if ([_entryMode containsString : PL_SIGNUP_MODE])
+    {
+        if (state == 1)
+        {
+            _entryMode = PL_LOGIN_MODE;
+            [self gotoPageForState:5]; //Goto login page
+        }
+        else if (state == 2) [self checkUsername];
+        else if (state == 3) [self checkEmailAndPasswordforSignup];
+        else if (state == 4) [self updateUserAvatar];
+        else if (state == 5) [self getUsernameAndPasswordAndLogin];
+        else if (state == 7) [self dismissViewControllerAnimated : YES completion:nil];
+        else [self gotoNthPage];
+    }
+    else if ([_entryMode containsString : PL_LOGIN_MODE]) //Login? only one place to go!
+    {
+        if (state == 6) [self checkEmailforPasswordReset];
+        else            [self getUsernameAndPasswordAndLogin];
+    }
+    else if ([_entryMode containsString : PL_AVATAR_MODE]) //Avatar? reset it
+        [self updateUserAvatar];
 }
 
 //----LoginViewController---------------------------------
-- (IBAction)facesSelect:(id)sender
+// This button is only used as a create account button for now...
+- (IBAction)LSBottomSelect:(id)sender
 {
-    NSLog(@" facesSelect");
+    NSLog(@" LSBottomSelect");
+    [self gotoPageForState:2];
 }
 
 //----LoginViewController---------------------------------
-// THis is the next button's target
-- (IBAction)saveSelect:(id)sender
+- (IBAction)anonymousSelect:(id)sender
 {
+    [self gotoPageForState:7]; //Goto anon page...
 }
 
 
@@ -622,27 +726,16 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 // Goes to reset pw page...
 - (IBAction)resetPasswordSelect:(id)sender
 {
-    needPwReset = true;
-    [self gotoNextPage];
+    page = state = 6; //Hard coded, state may be weird. just go to the right page
+    [self gotoNthPage];
 } //end resetPasswordSelect
 
 //----LoginViewController---------------------------------
 -(void)performPasswordReset
 {
-    needPwReset = FALSE;  //CLEAR flag!
-    //Get and validate email addy...
-    _emailString = _emailText.text.lowercaseString; //Get fresh email...
-    if (![self validateEmailWithString : _emailString] || [_emailString isEqualToString:@""])
-    {
-        [self pixAlertDEBUG:self :@"Bad Email Address" :@"Your email must be contain letters or numbers, a dot and the @ character" :false];
-        return;
-    }
-    //Addy legal? Try reset!
-    _activityView.hidden = FALSE;
-    _activityInfoLabel.text = @"Sending Email";
-    [ai startAnimating];
-    
+#ifdef IGNOREUSEREVENTS
     [UIApplication.sharedApplication beginIgnoringInteractionEvents];
+#endif
     [PFUser requestPasswordResetForEmailInBackground:_emailString
          block:^(BOOL succeeded, NSError *error) {
              if (!error)
@@ -653,12 +746,11 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
              {
                  [self pixAlertDEBUG:self :@"Reset Failed" : error.localizedDescription :false];
              }
-             self->_activityView.hidden = TRUE;
-             [self->ai stopAnimating];
+#ifdef IGNOREUSEREVENTS
              [UIApplication.sharedApplication endIgnoringInteractionEvents];
-             self->_resetPasswordButton.hidden = TRUE;
-             self->page = 4;
-             [self fifthPage]; //Go to Login page now...
+#endif
+             self->page = self->state = 5;
+             [self gotoNthPage]; //Go to Login page now...
          }];
 } //end performPasswordReset
 
@@ -671,8 +763,8 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     avatarImage = [avatarImage imageByScalingAndCroppingForSize :
                    CGSizeMake(LOGIN_AVATAR_SIZE, LOGIN_AVATAR_SIZE)  ];
     _portraitImage.image = avatarImage; //[UIImage imageNamed : name];
-    if (_rightButton.alpha == 0) //Only animate button in if not yet visible...
-        [self animateInOut:_rightButton    : 1 : 1.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+    _LSTopButton.hidden  = FALSE; //User can now proceed...
+
 } //end setupCannedAvatar
 
 //----LoginViewController---------------------------------
@@ -711,72 +803,45 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     [self setupCannedAvatar : 6 : sender];  // monet
 }
 
+
 //----LoginViewController---------------------------------
-// First page button....
-- (IBAction)loginSelect:(id)sender
+// Upload button...
+- (IBAction)uploadSelect:(id)sender
 {
-    if (animating) return;
-    [self gotoNextPage];
+   [self displayPhotoPicker];
 }
 
 //----LoginViewController---------------------------------
-// First page button....
-- (IBAction)signupSelect:(id)sender
-{
-    if (animating) return;
-    [self gotoNextPage];
-}
-
-//----LoginViewController---------------------------------
-// Cancel / Back button...
-- (IBAction)leftSelect:(id)sender {
+- (IBAction)backSelect:(id)sender {
     BOOL bailit = FALSE;
-    if (page == 1)
+    
+    //This mode has lots of states
+    if ([_entryMode containsString : PL_SIGNUP_MODE])
     {
-      [self anonymousInfoAlert:self];
+        if (state == 1) //5/27 this is same as "skip"
+        {
+            [self gotoPageForState:7];
+        }
+        else if (state == 7) // Bailout page? Return home
+        {
+            [self gotoPageForState:1];
+        }
+        else //Just go back one state
+        {
+            [self gotoPageForState:state-1];
+        }
     }
-    else if (page == 2)  //Avatar Page
+    else //Login /etc mode?
     {
-        if ([_entryMode containsString : PL_AVATAR_MODE]) bailit = TRUE;
-    }
-    else if (page == 4)  //Login cancel? Bail!
-    {
-        [PFUser logOut];   //shoould this be conditional on logged in status?
-        bailit = TRUE;  // can i get login status from pfuser?
-    }
-    else
-    {
-        //Go back one page...
-        NSLog(@" go back one page??.., page %d",page);
-        [self gotoPreviousPage];
+        if (state == 6) // PW reset? back to login
+        {
+            [self gotoPageForState:5];
+        }
     }
     if (bailit) [self dismissViewControllerAnimated : YES completion:nil];
-
-} //end leftSelect
-
-//----LoginViewController---------------------------------
-- (IBAction)rightSelect:(id)sender
-{
-    //NSLog(@" right button hit...");
-    if (page == 2 && [_entryMode containsString : PL_AVATAR_MODE])  //Avatar Page
-    {
-        [self updateCurrentUserInfo];
-    }
-    else
-    {
-        [self gotoNextPage];
-    }
-
-
 }
 
-//----LoginViewController---------------------------------
-// User doesn't want to register: Pass in as HueGogh
-- (IBAction)anonymousSelect:(id)sender
-{
-    NSLog(@" set up HueGogh here...");
-    [self anonymousInfoAlert:self];
-}
+
 
 
 //----LoginViewController---------------------------------
@@ -802,8 +867,8 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
         self->avatarImage = [self->avatarImage imageByScalingAndCroppingForSize :
                        CGSizeMake(LOGIN_AVATAR_SIZE, LOGIN_AVATAR_SIZE)  ];
         self->_portraitImage.image = self->avatarImage;
-        if (self->_rightButton.alpha == 0) //Only animate button in if not yet visible...
-            [self animateInOut:self->_rightButton    : 1 : 1.0 : 1.0 :(NSUInteger)UIViewAnimationOptionCurveEaseInOut: TRUE];
+        _LSTopButton.hidden  = FALSE; //User can now proceed...
+
     }];
 } //end didFinishPickingMediaWithInfo
 
@@ -876,11 +941,6 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
                                     actionWithTitle:@"OK"
                                     style:UIAlertActionStyleDefault
                                     handler:^(UIAlertAction * action) {
-                                        if (self->page == 3 && !self->signupError) //Signup...
-                                        {
-                                            self->page = 4;
-                                            [self fifthPage];
-                                        }
                                     }];
         
         [alert addAction:yesButton];
@@ -897,6 +957,28 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 
 #pragma mark - UITextFieldDelegate
 
+//======<UITextFieldDelegate>==========================================
+- (IBAction)textFieldChanged:(id)sender {
+    BOOL gotTop    =  (_topTextField.text.length > 0);
+    BOOL gotBottom =  (_bottomTextField.text.length > 0);
+
+    //Handle Next button enable/disable based on filled text fields
+    if (state == 2)
+    {
+        [_LSTopButton setEnabled:gotTop];
+    }
+    else if (state == 3) //email and password page?
+    {
+        [_LSTopButton setEnabled:(gotTop & gotBottom)];
+    }
+    else if (state == 6) //password reset? bottom text entered?
+    {
+        [_LSTopButton setEnabled:gotTop];
+    }
+
+} //end textFieldChanged
+
+
 //======(PixUtils)==========================================
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
@@ -908,10 +990,10 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
 //==========loginTestVC=========================================================================
 - (void)loginUser
 {
-    _activityView.hidden = FALSE;
-    _activityInfoLabel.text = @"Logging into Pix";
-    [ai startAnimating];
+#ifdef IGNOREUSEREVENTS
     [UIApplication.sharedApplication beginIgnoringInteractionEvents];
+#endif
+    [spv start:@"Logging in..."];
     [PFUser logInWithUsernameInBackground:_userName password:_password block:^(PFUser * _Nullable user, NSError * _Nullable error) {
         BOOL bailit = false;
         if (user != nil)
@@ -938,9 +1020,10 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
                 NSLog(@" three failures!!");
             }
         }
-        self->_activityView.hidden = TRUE;
-        [self->ai stopAnimating];
+        [self->spv stop];
+#ifdef IGNOREUSEREVENTS
         [UIApplication.sharedApplication endIgnoringInteractionEvents];
+#endif
         if (bailit)            //all done?
             [self dismissViewControllerAnimated : YES completion:nil];
     }];
@@ -955,13 +1038,16 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     user.password = _password;
     user.email    = _emailString;
     NSData *avatarData = UIImagePNGRepresentation(avatarImage);
-    PFFile *avatarImageFile = [PFFile fileWithName : @"avatarImage.png" data:avatarData];
+    PFFile *avatarImageFile = [PFFile fileWithName : @"avatar.png" data:avatarData];
     user[_PuserPortraitKey] = avatarImageFile;
-    _activityInfoLabel.text = @"Creating your profile";
-    _activityView.hidden = FALSE;
-    [ai startAnimating];
+    [spv start : @"Creating your profile"];
+    DBBeingAccessed = TRUE;
+#ifdef IGNOREUSEREVENTS
     [UIApplication.sharedApplication beginIgnoringInteractionEvents];
+#endif
     [user signUpInBackgroundWithBlock:^(BOOL success, NSError * _Nullable error) {
+        [self->spv stop];
+        self->DBBeingAccessed = FALSE;
         if (error != nil)
         {
             [self pixAlertDEBUG:self :@"Error Signing Up" : error.localizedDescription :false];
@@ -969,12 +1055,12 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
         }
         else
         {
-            [PFUser logOut]; //User must log in with verified email!
-            [self emailVerifyAlert];
+            [self gotoPageForState:self->state+1];
         }
-        self->_activityView.hidden = TRUE;
-        [self->ai stopAnimating];
+
+#ifdef IGNOREUSEREVENTS
         [UIApplication.sharedApplication endIgnoringInteractionEvents];
+#endif
     }];
 }  // end signupUser
 
@@ -986,6 +1072,20 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
     return [emailTest evaluateWithObject:emailIn];
 }
+
+//==========loginTestVC=========================================================================
+- (BOOL)validateUsernameWithString:(NSString*)uname
+{
+    NSCharacterSet *s = [NSCharacterSet characterSetWithCharactersInString:@"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_"];
+    s = [s invertedSet];
+    NSRange r = [uname rangeOfCharacterFromSet:s];
+    if (r.location != NSNotFound) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+
 
 //==========loginTestVC=========================================================================
 // Boilerplate from stackoverflow
@@ -1001,14 +1101,6 @@ NSString *const _PuserPortraitKey       = @"userPortrait";
     return [emailTest evaluateWithObject:checkString];
 }
 
-
-//==========loginTestVC=========================================================================
-- (void)textFieldDidBeginEditing:(UITextField *)textField
-{
-    //NSLog(@" ended editing txt %@",textField);
-    //NSLog(@" annnd text is %@",textField.text);
-    
-}
 
 
 

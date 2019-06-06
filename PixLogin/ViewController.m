@@ -60,6 +60,14 @@ NSString * testMode;
 }
 
 //==========loginTestVC=========================================================================
+-(void) viewDidAppear:(BOOL)animated
+{
+    testMode = PL_SIGNUP_MODE;
+  //  [self performSegueWithIdentifier:@"loginSegue" sender:@"mainVC"];
+}
+
+
+//==========loginTestVC=========================================================================
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
