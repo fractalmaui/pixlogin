@@ -83,7 +83,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *forgotButton;
 
 
-@property (strong, nonatomic) NSString *userName;
+@property (strong, nonatomic) NSString *hueName;
 @property (strong, nonatomic) NSString *password;
 @property (strong, nonatomic) NSString *emailString;
 
